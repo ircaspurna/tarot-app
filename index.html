@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sacred Space | Personal Tarot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500;600&family=Tenor+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-spiritual: #12101a;
+            --bg-prosperity: #0f1210;
+            --gold: #c9a227;
+            --gold-light: #e8d48b;
+            --purple-deep: #2d1b4e;
+            --purple-mystic: #6b3fa0;
+            --green-prosperity: #1a3a2a;
+            --green-light: #4a7c59;
+            --text-light: #e8e4dc;
+            --text-muted: #9a9590;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.4;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(107, 63, 160, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(201, 162, 39, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(74, 124, 89, 0.08) 0%, transparent 70%);
+            animation: ambientShift 20s ease-in-out infinite;
+        }
+        @keyframes ambientShift { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.6; } }
+
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; padding: 1.5rem 3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 100; background: linear-gradient(to bottom, rgba(10, 10, 15, 0.95), transparent);
+        }
+        .logo { font-family: 'Cinzel', serif; font-size: 1.1rem; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; }
+        .nav-links { display: flex; gap: 2.5rem; }
+        .nav-link {
+            font-family: 'Tenor Sans', sans-serif; font-size: 0.75rem; letter-spacing: 0.15em;
+            text-transform: uppercase; color: var(--text-muted); text-decoration: none;
+            cursor: pointer; transition: color 0.3s ease; background: none; border: none;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--text-light); }
+
+        .container { position: relative; z-index: 1; padding: 8rem 3rem 4rem; max-width: 1400px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-title {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 400;
+            letter-spacing: 0.2em; margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-light) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .section-subtitle { font-size: 1.1rem; font-style: italic; color: var(--text-muted); font-weight: 300; }
+
+        .screen { display: none; animation: fadeIn 0.6s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .home-intro { text-align: center; max-width: 700px; margin: 0 auto 5rem; }
+        .home-intro p { font-size: 1.25rem; line-height: 1.9; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        .deck-choice { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; margin-bottom: 5rem; }
+        .deck-card {
+            position: relative; padding: 3rem; border-radius: 4px; cursor: pointer;
+            transition: all 0.4s ease; overflow: hidden;
+        }
+        .deck-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; transition: border-color 0.4s ease;
+        }
+        .deck-card:hover::before { border-color: rgba(255, 255, 255, 0.25); }
+        .deck-spiritual { background: linear-gradient(145deg, var(--bg-spiritual) 0%, rgba(45, 27, 78, 0.3) 100%); }
+        .deck-prosperity { background: linear-gradient(145deg, var(--bg-prosperity) 0%, rgba(26, 58, 42, 0.3) 100%); }
+        .deck-card:hover { transform: translateY(-5px); }
+
+        .deck-icon { width: 80px; height: 100px; margin: 0 auto 2rem; position: relative; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+        .deck-spiritual .deck-icon { background: linear-gradient(180deg, var(--purple-mystic) 0%, var(--purple-deep) 100%); }
+        .deck-prosperity .deck-icon { background: linear-gradient(180deg, var(--green-light) 0%, var(--green-prosperity) 100%); }
+        .deck-icon svg { width: 40px; height: 40px; opacity: 0.8; }
+
+        .deck-name { font-family: 'Cinzel', serif; font-size: 1.3rem; letter-spacing: 0.15em; text-align: center; margin-bottom: 1rem; }
+        .deck-spiritual .deck-name { color: #b794d4; }
+        .deck-prosperity .deck-name { color: var(--gold-light); }
+        .deck-description { font-size: 1.05rem; line-height: 1.8; color: var(--text-muted); text-align: center; }
+
+        .spreads-section { margin-top: 4rem; }
+        .spreads-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .spread-card {
+            padding: 2rem; background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 4px;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .spread-card:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(201, 162, 39, 0.3); transform: translateY(-3px); }
+        .spread-name { font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.75rem; }
+        .spread-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+        .spread-cards-count { font-family: 'Tenor Sans', sans-serif; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-top: 1rem; opacity: 0.7; }
+
+        .reading-area { min-height: 60vh; display: flex; flex-direction: column; align-items: center; }
+        .spread-layout { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin: 3rem 0; }
+        .card-slot {
+            width: 140px; height: 210px; border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 12px; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; cursor: pointer; transition: all 0.4s ease; position: relative;
+            background: radial-gradient(ellipse at center, rgba(201, 162, 39, 0.03) 0%, transparent 70%);
+        }
+        .card-slot::before {
+            content: ''; position: absolute; inset: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;
+            transition: all 0.4s ease;
+        }
+        .card-slot:hover:not(.revealed) {
+            border-color: var(--gold);
+            background: radial-gradient(ellipse at center, rgba(201, 162, 39, 0.12) 0%, transparent 70%);
+            box-shadow: 0 0 20px rgba(201, 162, 39, 0.2), inset 0 0 20px rgba(201, 162, 39, 0.1);
+            transform: translateY(-3px);
+        }
+        .card-slot:hover:not(.revealed)::before {
+            border-color: rgba(201, 162, 39, 0.3);
+        }
+        .card-slot.revealed { border: none; cursor: default; }
+        .slot-label { font-family: 'Tenor Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); text-align: center; padding: 0 0.5rem; }
+        .slot-number { font-family: 'Cinzel', serif; font-size: 2rem; color: rgba(255, 255, 255, 0.1); margin-bottom: 0.5rem; }
+        .tarot-card {
+            width: 140px; height: 210px; position: relative; perspective: 1000px; cursor: pointer;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+            transition: all 0.3s ease;
+        }
+        .tarot-card:hover { filter: drop-shadow(0 8px 24px rgba(201, 162, 39, 0.4)); }
+        .tarot-card-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .tarot-card.flipped .tarot-card-inner { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; overflow: hidden; }
+
+        /* Enhanced Card Back */
+        .card-back {
+            background:
+                radial-gradient(circle at 50% 50%, rgba(201, 162, 39, 0.15) 0%, transparent 50%),
+                linear-gradient(145deg, #1a1520 0%, #0d0a12 100%);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, rgba(201, 162, 39, 0.6), rgba(107, 63, 160, 0.6), rgba(201, 162, 39, 0.6)) 1;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .card-back::before {
+            content: ''; position: absolute; inset: 8px;
+            border: 1px solid rgba(201, 162, 39, 0.3); border-radius: 8px;
+            background:
+                repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(201, 162, 39, 0.05) 5px, rgba(201, 162, 39, 0.05) 10px),
+                repeating-linear-gradient(-45deg, transparent, transparent 5px, rgba(107, 63, 160, 0.05) 5px, rgba(107, 63, 160, 0.05) 10px);
+        }
+        .card-back-pattern {
+            width: 70%; height: 75%; position: relative; z-index: 1;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+        }
+        .card-back-symbol {
+            font-family: 'Cinzel', serif; font-size: 3rem; color: var(--gold);
+            filter: drop-shadow(0 0 8px rgba(201, 162, 39, 0.6));
+            animation: symbolPulse 3s ease-in-out infinite;
+        }
+        @keyframes symbolPulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Enhanced Card Front */
+        .card-front {
+            transform: rotateY(180deg); display: flex; flex-direction: column;
+            border: 2px solid; position: relative; overflow: hidden;
+        }
+        .card-front::before {
+            content: ''; position: absolute; inset: 6px; border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1); pointer-events: none; z-index: 10;
+        }
+        .card-front::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none; z-index: 1; opacity: 0.5;
+        }
+        .card-front.spiritual {
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(107, 63, 160, 0.4) 0%, transparent 60%),
+                linear-gradient(180deg, var(--purple-deep) 0%, #0a0612 50%, #1a1225 100%);
+            border-image: linear-gradient(180deg, rgba(183, 148, 212, 0.8), rgba(107, 63, 160, 0.6), rgba(183, 148, 212, 0.4)) 1;
+            box-shadow:
+                inset 0 1px 1px rgba(183, 148, 212, 0.3),
+                0 0 20px rgba(107, 63, 160, 0.3);
+        }
+        .card-front.prosperity {
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, 0.3) 0%, transparent 60%),
+                linear-gradient(180deg, var(--green-prosperity) 0%, #050a08 50%, #0a1510 100%);
+            border-image: linear-gradient(180deg, rgba(232, 212, 139, 0.8), rgba(74, 124, 89, 0.6), rgba(201, 162, 39, 0.6)) 1;
+            box-shadow:
+                inset 0 1px 1px rgba(232, 212, 139, 0.3),
+                0 0 20px rgba(201, 162, 39, 0.2);
+        }
+        .card-image {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 1.5rem; font-size: 4rem; position: relative; z-index: 5;
+        }
+        .card-image::before {
+            content: ''; position: absolute;
+            width: 90px; height: 90px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+        .spiritual .card-image::before {
+            box-shadow: 0 0 30px rgba(107, 63, 160, 0.4), 0 0 60px rgba(183, 148, 212, 0.2);
+            animation: spiritualGlow 4s ease-in-out infinite;
+        }
+        .prosperity .card-image::before {
+            box-shadow: 0 0 30px rgba(201, 162, 39, 0.4), 0 0 60px rgba(232, 212, 139, 0.2);
+            animation: prosperityGlow 4s ease-in-out infinite;
+        }
+        @keyframes spiritualGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(107, 63, 160, 0.4), 0 0 60px rgba(183, 148, 212, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(107, 63, 160, 0.6), 0 0 80px rgba(183, 148, 212, 0.3); }
+        }
+        @keyframes prosperityGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(201, 162, 39, 0.4), 0 0 60px rgba(232, 212, 139, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(201, 162, 39, 0.6), 0 0 80px rgba(232, 212, 139, 0.3); }
+        }
+        .card-title {
+            font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.12em;
+            text-align: center; padding: 0.9rem 0.5rem;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+            text-transform: uppercase; position: relative; z-index: 5;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* Corner stars */
+        .card-title::before, .card-title::after {
+            content: '✦'; position: absolute; font-size: 0.6rem; opacity: 0.4;
+            font-family: Arial, sans-serif; pointer-events: none;
+        }
+        .card-title::before { top: -80px; left: 8px; }
+        .card-title::after { top: -80px; right: 8px; }
+        .card-front.spiritual .card-title {
+            color: #d4b8f0;
+            text-shadow: 0 0 10px rgba(183, 148, 212, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        .card-front.prosperity .card-title {
+            color: #f0e4b8;
+            text-shadow: 0 0 10px rgba(232, 212, 139, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        .card-reversed {
+            position: absolute; top: 8px; right: 8px;
+            font-family: 'Tenor Sans', sans-serif; font-size: 0.5rem;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            background: rgba(0, 0, 0, 0.5); padding: 0.2rem 0.4rem; border-radius: 2px;
+            color: rgba(255, 255, 255, 0.7); transform: rotate(180deg); z-index: 15;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .interpretation-panel { max-width: 800px; margin: 3rem auto 0; padding: 3rem; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 4px; display: none; }
+        .interpretation-panel.active { display: block; animation: fadeIn 0.5s ease; }
+        .interp-card-name { font-family: 'Cinzel', serif; font-size: 1.5rem; letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+        .interp-card-name.spiritual { color: #b794d4; }
+        .interp-card-name.prosperity { color: var(--gold-light); }
+        .interp-position { font-family: 'Tenor Sans', sans-serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2rem; }
+        .interp-text { font-size: 1.15rem; line-height: 1.9; color: var(--text-light); }
+        .interp-reversed-note { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); font-style: italic; color: var(--text-muted); }
+        .actions { display: flex; gap: 1.5rem; justify-content: center; margin-top: 3rem; flex-wrap: wrap; }
+        .btn {
+            font-family: 'Tenor Sans', sans-serif; font-size: 0.75rem; letter-spacing: 0.15em;
+            text-transform: uppercase; padding: 1rem 2.5rem; border: 1px solid var(--gold);
+            background: transparent; color: var(--gold); cursor: pointer; transition: all 0.3s ease; border-radius: 2px;
+        }
+        .btn:hover { background: var(--gold); color: var(--bg-dark); }
+        .btn-secondary { border-color: rgba(255, 255, 255, 0.2); color: var(--text-muted); }
+        .btn-secondary:hover { border-color: var(--text-light); color: var(--text-light); background: transparent; }
+        .deck-selector { display: flex; gap: 1rem; margin-bottom: 2rem; }
+        .deck-btn {
+            font-family: 'Tenor Sans', sans-serif; font-size: 0.7rem; letter-spacing: 0.12em;
+            text-transform: uppercase; padding: 0.75rem 1.5rem; border: 1px solid rgba(255, 255, 255, 0.15);
+            background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.3s ease; border-radius: 2px;
+        }
+        .deck-btn:hover { border-color: rgba(255, 255, 255, 0.3); color: var(--text-light); }
+        .deck-btn.active.spiritual { border-color: var(--purple-mystic); color: #b794d4; background: rgba(107, 63, 160, 0.1); }
+        .deck-btn.active.prosperity { border-color: var(--gold); color: var(--gold-light); background: rgba(201, 162, 39, 0.1); }
+        .reading-summary { max-width: 900px; margin: 4rem auto 0; padding: 3rem; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 4px; display: none; }
+        .reading-summary.active { display: block; }
+        .summary-title { font-family: 'Cinzel', serif; font-size: 1.3rem; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 2rem; text-align: center; }
+        .summary-cards { display: flex; flex-direction: column; gap: 2rem; }
+        .summary-card-item { padding-bottom: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .summary-card-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .summary-position { font-family: 'Tenor Sans', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+        .summary-card-name { font-family: 'Cinzel', serif; font-size: 1.1rem; margin-bottom: 1rem; }
+        .summary-card-name.spiritual { color: #b794d4; }
+        .summary-card-name.prosperity { color: var(--gold-light); }
+        .summary-interpretation { font-size: 1.05rem; line-height: 1.8; color: var(--text-muted); }
+        .journal-section { max-width: 800px; margin: 3rem auto 0; }
+        .journal-textarea {
+            width: 100%; min-height: 150px; padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px; color: var(--text-light); font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem; line-height: 1.7; resize: vertical;
+        }
+        .journal-textarea:focus { outline: none; border-color: rgba(201, 162, 39, 0.3); }
+        .journal-textarea::placeholder { color: var(--text-muted); opacity: 0.5; }
+        .deck-browser { margin-top: 2rem; }
+        .suit-section { margin-bottom: 4rem; }
+        .suit-title { font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 0.15em; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .suit-title.spiritual { color: #b794d4; }
+        .suit-title.prosperity { color: var(--gold-light); }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1.5rem; }
+        .browse-card { cursor: pointer; transition: transform 0.3s ease; }
+        .browse-card:hover { transform: translateY(-5px); }
+        .browse-card .tarot-card { width: 100%; height: 165px; }
+        .browse-card .tarot-card .card-face { width: 100%; height: 100%; }
+        .browse-card .card-front { transform: none; }
+        .browse-card .card-image { font-size: 2rem; }
+        .browse-card .card-title { font-size: 0.5rem; }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.9); display: none; align-items: center;
+            justify-content: center; z-index: 1000; padding: 2rem; overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: var(--bg-dark); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px; max-width: 700px; width: 100%; max-height: 90vh;
+            overflow-y: auto; padding: 3rem; position: relative;
+        }
+        .modal-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: color 0.3s ease; }
+        .modal-close:hover { color: var(--text-light); }
+        .modal-card-display { display: flex; gap: 2rem; margin-bottom: 2rem; align-items: flex-start; }
+        .modal-card-image { width: 140px; height: 210px; flex-shrink: 0; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-card-image.spiritual { background: linear-gradient(180deg, var(--purple-deep) 0%, #1a1225 100%); border: 1px solid rgba(107, 63, 160, 0.4); }
+        .modal-card-image.prosperity { background: linear-gradient(180deg, var(--green-prosperity) 0%, #0a1510 100%); border: 1px solid rgba(74, 124, 89, 0.4); }
+        .modal-card-image .card-image { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+        .modal-card-image .card-title { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.1em; text-align: center; padding: 0.75rem 0.5rem; background: rgba(0, 0, 0, 0.3); text-transform: uppercase; }
+        .modal-card-info h2 { font-family: 'Cinzel', serif; font-size: 1.5rem; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+        .modal-card-info h2.spiritual { color: #b794d4; }
+        .modal-card-info h2.prosperity { color: var(--gold-light); }
+        .modal-card-suit { font-family: 'Tenor Sans', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem; }
+        .modal-keywords { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .keyword { font-family: 'Tenor Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.4rem 0.8rem; border-radius: 2px; background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+        .modal-interpretation { margin-top: 2rem; }
+        .modal-interpretation h3 { font-family: 'Cinzel', serif; font-size: 0.9rem; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 1rem; }
+        .modal-interpretation p { font-size: 1.1rem; line-height: 1.9; color: var(--text-light); margin-bottom: 1.5rem; }
+        .modal-reversed { padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .modal-reversed h3 { color: var(--text-muted); }
+        .modal-reversed p { color: var(--text-muted); font-style: italic; }
+
+        @media (max-width: 768px) {
+            .nav { padding: 1rem 1.5rem; }
+            .nav-links { gap: 1.5rem; }
+            .container { padding: 6rem 1.5rem 3rem; }
+            .section-title { font-size: 1.8rem; }
+            .deck-choice { grid-template-columns: 1fr; }
+            .spread-layout { gap: 1rem; }
+            .card-slot, .tarot-card { width: 100px; height: 150px; }
+            .card-image { font-size: 2rem; }
+            .card-title { font-size: 0.5rem; padding: 0.5rem 0.25rem; }
+            .modal-card-display { flex-direction: column; align-items: center; }
+            .interpretation-panel, .reading-summary { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-bg"></div>
+
+    <nav class="nav">
+        <div class="logo">Sacred Space</div>
+        <div class="nav-links">
+            <button class="nav-link active" data-screen="home">Home</button>
+            <button class="nav-link" data-screen="reading">Reading</button>
+            <button class="nav-link" data-screen="browse">Browse Decks</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="home" class="screen active">
+            <div class="section-header">
+                <h1 class="section-title">Your Sacred Space</h1>
+                <p class="section-subtitle">Where the depths meet the material</p>
+            </div>
+
+            <div class="home-intro">
+                <p>This is your personal space for communion with the cards. Two decks await you—one speaks to the soul's journey through shadow and light, the other illuminates the path of authentic abundance and sovereign creation.</p>
+                <p>Select a deck below, then choose your spread to begin.</p>
+            </div>
+
+            <div class="deck-choice">
+                <div class="deck-card deck-spiritual" onclick="selectDeckAndGo('spiritual')">
+                    <div class="deck-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 2 L12 22 M2 12 L22 12"/>
+                            <circle cx="12" cy="12" r="4"/>
+                        </svg>
+                    </div>
+                    <h2 class="deck-name">The Jungian Depths</h2>
+                    <p class="deck-description">Archetypes of the collective unconscious. Shadow integration. Anima and animus. The individuation journey. Alchemical transformation of lead into gold—the gold of authentic selfhood.</p>
+                </div>
+
+                <div class="deck-card deck-prosperity" onclick="selectDeckAndGo('prosperity')">
+                    <div class="deck-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <polygon points="12,2 15,9 22,9 17,14 19,22 12,17 5,22 7,14 2,9 9,9"/>
+                        </svg>
+                    </div>
+                    <h2 class="deck-name">Universal Prosperity</h2>
+                    <p class="deck-description">Abundance as natural law. Money as energy flow. Career as calling made manifest. Success measured in alignment, not accumulation. The universe's economy of authentic expression.</p>
+                </div>
+            </div>
+
+            <div class="spreads-section">
+                <div class="section-header">
+                    <h2 class="section-title" style="font-size: 1.5rem;">Choose Your Spread</h2>
+                </div>
+                <div class="spreads-grid">
+                    <div class="spread-card" onclick="startReading('shadow')">
+                        <h3 class="spread-name">Shadow Integration</h3>
+                        <p class="spread-desc">What lies hidden, what it protects, and the path to integration. For times when old patterns resurface.</p>
+                        <p class="spread-cards-count">3 cards</p>
+                    </div>
+
+                    <div class="spread-card" onclick="startReading('sovereignty')">
+                        <h3 class="spread-name">Sovereignty Reclamation</h3>
+                        <p class="spread-desc">The old pattern ready to release, the truth beneath it, and the action step toward freedom.</p>
+                        <p class="spread-cards-count">3 cards</p>
+                    </div>
+
+                    <div class="spread-card" onclick="startReading('business')">
+                        <h3 class="spread-name">Authentic Launch</h3>
+                        <p class="spread-desc">For bringing your gifts into the world. The fear to face, the gift to offer, and the first sacred step.</p>
+                        <p class="spread-cards-count">3 cards</p>
+                    </div>
+
+                    <div class="spread-card" onclick="startReading('expansion')">
+                        <h3 class="spread-name">Expansion Check</h3>
+                        <p class="spread-desc">A simple compass reading. Is this path expansion or contraction? Trust your body's wisdom.</p>
+                        <p class="spread-cards-count">1 card</p>
+                    </div>
+
+                    <div class="spread-card" onclick="startReading('ancestral')">
+                        <h3 class="spread-name">Ancestral Pattern</h3>
+                        <p class="spread-desc">What was inherited, what you're transforming, and what you're liberating for those who come after.</p>
+                        <p class="spread-cards-count">3 cards</p>
+                    </div>
+
+                    <div class="spread-card" onclick="startReading('dissolution')">
+                        <h3 class="spread-name">Dissolution & Emergence</h3>
+                        <p class="spread-desc">For times of profound transition. What's dissolving, what's emerging, the void between, and how to navigate.</p>
+                        <p class="spread-cards-count">4 cards</p>
+                    </div>
+
+                    <div class="spread-card" onclick="startReading('single')">
+                        <h3 class="spread-name">Single Card</h3>
+                        <p class="spread-desc">A message for right now. Clear, direct, from whichever deck calls to you.</p>
+                        <p class="spread-cards-count">1 card</p>
+                    </div>
+
+                    <div class="spread-card" onclick="startReading('dual')">
+                        <h3 class="spread-name">Dual Wisdom</h3>
+                        <p class="spread-desc">One question, both decks. Spirit speaks, then grounds into the practical.</p>
+                        <p class="spread-cards-count">2 cards</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="reading" class="screen">
+            <div class="section-header">
+                <h1 class="section-title" id="spread-title">Your Reading</h1>
+                <p class="section-subtitle" id="spread-subtitle">Click each position to reveal your card</p>
+            </div>
+
+            <div class="deck-selector">
+                <button class="deck-btn spiritual active" data-deck="spiritual" onclick="setActiveDeck('spiritual')">Jungian Depths</button>
+                <button class="deck-btn prosperity" data-deck="prosperity" onclick="setActiveDeck('prosperity')">Universal Prosperity</button>
+            </div>
+
+            <div class="reading-area">
+                <div class="spread-layout" id="spread-layout"></div>
+            </div>
+
+            <div class="interpretation-panel" id="interpretation-panel">
+                <h2 class="interp-card-name" id="interp-card-name"></h2>
+                <p class="interp-position" id="interp-position"></p>
+                <p class="interp-text" id="interp-text"></p>
+                <p class="interp-reversed-note" id="interp-reversed" style="display: none;"></p>
+            </div>
+
+            <div class="reading-summary" id="reading-summary">
+                <h2 class="summary-title">Complete Reading</h2>
+                <div class="summary-cards" id="summary-cards"></div>
+            </div>
+
+            <div class="journal-section">
+                <textarea class="journal-textarea" placeholder="Your reflections, insights, feelings... What arose as you drew these cards? What does your body tell you?"></textarea>
+            </div>
+
+            <div class="actions">
+                <button class="btn" onclick="resetReading()">New Reading</button>
+                <button class="btn btn-secondary" onclick="showScreen('home')">Back to Home</button>
+            </div>
+        </div>
+
+        <div id="browse" class="screen">
+            <div class="section-header">
+                <h1 class="section-title">Browse the Decks</h1>
+                <p class="section-subtitle">Explore each card's wisdom at your own pace</p>
+            </div>
+
+            <div class="deck-selector" style="justify-content: center; margin-bottom: 3rem;">
+                <button class="deck-btn spiritual active" data-deck="spiritual" onclick="setBrowseDeck('spiritual')">Jungian Depths</button>
+                <button class="deck-btn prosperity" data-deck="prosperity" onclick="setBrowseDeck('prosperity')">Universal Prosperity</button>
+            </div>
+
+            <div class="deck-browser" id="deck-browser"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="card-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-card-display">
+                <div class="modal-card-image" id="modal-card-image">
+                    <div class="card-image" id="modal-symbol"></div>
+                    <div class="card-title" id="modal-title-small"></div>
+                </div>
+                <div class="modal-card-info">
+                    <h2 id="modal-card-name"></h2>
+                    <p class="modal-card-suit" id="modal-card-suit"></p>
+                    <div class="modal-keywords" id="modal-keywords"></div>
+                </div>
+            </div>
+            <div class="modal-interpretation">
+                <h3>Upright Meaning</h3>
+                <p id="modal-upright"></p>
+                <div class="modal-reversed">
+                    <h3>Reversed / Shadow Aspect</h3>
+                    <p id="modal-reversed"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ============================================================================
+// PART 1: JUNGIAN DEPTHS DECK - Complete 78 Cards
+// ============================================================================
+
+const jungianDeck = {
+    majorArcana: [
+        {
+            name: "The Fool",
+            number: 0,
+            symbol: "🌀",
+            keywords: ["Innocence", "Leap of Faith", "New Cycle", "Divine Madness"],
+            upright: "You stand at the edge of the unknown, and something within you is ready to leap. This is not recklessness—it is the sacred foolishness of the soul that knows it cannot fall, only fly or learn. The Fool carries nothing because everything they need will appear on the path. You are being called to trust in what you cannot yet see, to release the death-grip on certainty. The dog at your heels is instinct; the cliff is the end of what you've known. Step forward.",
+            reversed: "Fear masquerading as wisdom is holding you back. The mind creates elaborate reasons why you shouldn't move, shouldn't change, shouldn't risk the dissolution of who you've been. Sometimes the reversed Fool indicates impulsive action without grounding—leaping to escape rather than leaping toward something true. Pause. Feel your feet. Then ask again: is this fear or genuine knowing?"
+        },
+        {
+            name: "The Magician",
+            number: 1,
+            symbol: "∞",
+            keywords: ["Manifestation", "Will", "Channel", "As Above So Below"],
+            upright: "You are the conduit between worlds. Everything you need to create is already present—you need only recognize your power to arrange it. The Magician doesn't create from nothing; they align with the forces that flow through all things. Your words have power now. Your focused will shapes reality. The tools on the table represent the four elements, the four suits, the full spectrum of creation available to you. What will you speak into being?",
+            reversed: "Power turned inward becomes manipulation or self-sabotage. Are you using your considerable gifts against yourself? The reversed Magician may indicate scattered energy, trying to manifest while internally conflicted. You cannot create clearly from a divided house. What internal opposition needs to be acknowledged and integrated before you wield your full power?"
+        },
+        {
+            name: "The High Priestess",
+            number: 2,
+            symbol: "☽",
+            keywords: ["Mystery", "Intuition", "The Unconscious", "Sacred Feminine"],
+            upright: "She sits between the pillars, guardian of what cannot be spoken but must be known. You are being called inward, to the places where logic cannot reach but knowing lives. The answers you seek are not in books or others' opinions—they're in the space between your thoughts, in dreams, in the body's subtle signals. Trust what you know without knowing how you know it. The veil is thin now.",
+            reversed: "You've been ignoring your inner knowing, perhaps because what it tells you is inconvenient or frightening. What truth are you not yet ready to see? It's waiting patiently. Reversed, she may also indicate secrets, hidden information, or intuition clouded by wishful thinking. Discernment requires honesty with yourself first."
+        },
+        {
+            name: "The Empress",
+            number: 3,
+            symbol: "♀",
+            keywords: ["Creation", "Abundance", "Nurturing", "Embodiment"],
+            upright: "Life force flows through you now, abundant and generative. The Empress is not passive fertility but active creation—she grows things from the substance of her own being. There's permission here to receive, to allow pleasure, to trust that abundance is your natural state when you're aligned with your true nature. What wants to be born through you? Your body knows.",
+            reversed: "Creative energy turned inward can become destructive. Are you nurturing everyone but yourself? Giving from a depleted well? The reversed Empress may indicate creative blocks, disconnection from the body, or the belief that you must earn the right to rest, to receive, to simply be. What about your own garden?"
+        },
+        {
+            name: "The Emperor",
+            number: 4,
+            symbol: "♂",
+            keywords: ["Structure", "Authority", "Boundaries", "Sacred Masculine"],
+            upright: "True authority comes from alignment with truth, not domination over others. The Emperor represents the healthy masculine principle—the capacity to create structure that serves life, to set boundaries that protect what matters, to take up space without apology. Build frameworks that support your growth. Say no to what depletes you. You have every right to take your throne.",
+            reversed: "Authority wounded becomes tyranny or abdication. Are you giving your power away to external authorities who don't have your answers? Or wielding power harshly against yourself or others? The reversed Emperor may indicate rigidity, control issues, or the collapse of necessary structure. What needs benevolent order rather than chaos or domination?"
+        },
+        {
+            name: "The Hierophant",
+            number: 5,
+            symbol: "⛧",
+            keywords: ["Tradition", "Teaching", "Initiation", "Sacred Knowledge"],
+            upright: "Some wisdom must be transmitted, not discovered alone. You may be called to learn from a tradition now, or to become a teacher yourself. The Hierophant represents the lineage of wisdom, the initiatory path, the recognition that you stand on the shoulders of those who came before. Honor the tradition while remaining true to your own direct gnosis. You are both student and teacher.",
+            reversed: "Dogma mistaken for truth. The reversed Hierophant indicates a false teacher, a tradition that has become rigid and life-denying, or blind adherence to rules that no longer serve. Sometimes it's a call to become your own authority, to trust your direct experience over inherited belief. Discernment is required. What teaching has become a cage?"
+        },
+        {
+            name: "The Lovers",
+            number: 6,
+            symbol: "⚤",
+            keywords: ["Choice", "Integration", "Sacred Union", "Values"],
+            upright: "Every choice is a revelation of values. The Lovers is not simply about romance—it's about the choices that align or divide us from our deepest truth. What are you choosing? And does it reflect who you're becoming? This card may indicate a significant relationship, but more deeply, it speaks to the inner marriage of opposites—masculine and feminine, shadow and light, spirit and matter. Choose wholeness.",
+            reversed: "Internal division projects outward as relationship conflict or paralyzed indecision. What inner marriage needs to happen before outer union is possible? The reversed Lovers may indicate values misalignment, choosing what others want over what your soul needs, or the painful recognition that a relationship no longer serves your growth. Sometimes the most loving choice is to release."
+        },
+        {
+            name: "The Chariot",
+            number: 7,
+            symbol: "⊕",
+            keywords: ["Will", "Direction", "Integration of Opposites", "Victory"],
+            upright: "Opposing forces harnessed become unstoppable momentum. The Chariot represents the victory that comes not from destroying opposition but from integrating it. The black and white sphinxes pull in different directions until the charioteer brings them into alignment. You have the reins. Claim your direction and move with the full power of your integrated being. Nothing can stop you now.",
+            reversed: "Inner conflict immobilizes or sends you careening in scattered directions. The horses are pulling apart and the chariot cannot advance. Pause. The victory you seek requires internal alignment first. What opposing forces within you need to be acknowledged and brought into conversation? You cannot move forward from a divided self."
+        },
+        {
+            name: "Strength",
+            number: 8,
+            symbol: "∞",
+            keywords: ["Inner Power", "Gentle Force", "Shadow Taming", "Courage"],
+            upright: "True strength is the gentle hand that tames the lion—not through dominance but through presence, love, and unwavering compassion. You have the capacity to meet your own wild, frightening, instinctual nature without violence. Your softness is your power. The lion represents the shadow, the untamed aspects of self that seem dangerous but hold tremendous vitality. Befriend it. Your courage is needed now.",
+            reversed: "Strength reversed can indicate shadow overwhelm—the lion has broken free and you feel at its mercy. Or its opposite: over-control, squeezing the life out of your instinctual nature, denying your wildness until it erupts. You have more power than you're willing to claim. You are also more tender than you're allowing yourself to be. Both are true."
+        },
+        {
+            name: "The Hermit",
+            number: 9,
+            symbol: "☆",
+            keywords: ["Solitude", "Inner Light", "Soul Search", "Wisdom"],
+            upright: "The light you seek has been within you all along. The Hermit withdraws not from fear but from necessity—some truths can only be found in solitude, in the dark night of the soul, in the voluntary exile from the noise of the world. Trust the lamp you carry; it has never gone out. This is a time for introspection, for the deep work that cannot be done in company. You are your own guru.",
+            reversed: "Isolation becomes prison rather than sanctuary. Or fear of necessary solitude—staying busy to avoid facing what waits in the silence. What are you afraid to meet in the dark? What truth are you avoiding by staying constantly connected to others? The Hermit reversed may also indicate loneliness masquerading as spiritual seeking. Community may be needed, not more isolation."
+        },
+        {
+            name: "Wheel of Fortune",
+            number: 10,
+            symbol: "☸",
+            keywords: ["Cycles", "Fate", "Change", "Karma"],
+            upright: "The wheel turns regardless of your preferences—but you can choose where you place yourself upon it. At the center, all is stillness; on the rim, constant change. Observe the cycles operating in your life—what keeps returning because it hasn't been integrated? What pattern is completing now? The Wheel reminds you that both good fortune and challenging times are temporary. Everything is in motion.",
+            reversed: "Resistance to change only increases suffering. The wheel is always turning; what's ending creates space for what's emerging, but you're clinging to what was. The reversed Wheel may indicate bad luck, a downward cycle, or the consequences of past actions arriving for reconciliation. Sometimes it's karma—not punishment, but education. What is this teaching you?"
+        },
+        {
+            name: "Justice",
+            number: 11,
+            symbol: "⚖",
+            keywords: ["Truth", "Consequence", "Balance", "Accountability"],
+            upright: "Truth has its own gravity—everything eventually orbits toward it. Justice represents the perfect accounting that exists beneath apparent chaos, the law of cause and effect, the recognition that your actions have created your current reality. You're being called to radical honesty now—with yourself first. What needs to be brought into balance? Where are you avoiding accountability? The sword cuts through illusion; the scales measure with precision.",
+            reversed: "Avoidance of truth creates its own suffering. Where are you out of alignment with your own integrity? The reversed Justice may indicate unfairness, corruption, or the painful awareness that life sometimes doesn't seem fair. It may also point to self-judgment, harsh inner criticism, or the belief that you deserve punishment. Compassion and accountability can coexist."
+        },
+        {
+            name: "The Hanged Man",
+            number: 12,
+            symbol: "⍑",
+            keywords: ["Surrender", "New Perspective", "Suspension", "Sacrifice"],
+            upright: "Sometimes the path forward requires hanging upside down until everything you thought you knew rearranges itself. The Hanged Man represents voluntary sacrifice—what are you willing to release, to let go of, to surrender? This is not defeat but initiation. The pause that feels like stuckness is actually gestation. You are being reorganized at a deep level. Let go. Trust the process. What you're releasing will make room for what you're becoming.",
+            reversed: "Refusal to surrender prolongs the suffering. You're struggling against what is, trying to force movement when stillness is required. The reversed Hanged Man may indicate martyrdom—unnecessary sacrifice, suffering without transformation, or playing the victim. Are you sacrificing your truth to keep the peace? That's not sacred surrender; that's self-abandonment."
+        },
+        {
+            name: "Death",
+            number: 13,
+            symbol: "⚰",
+            keywords: ["Transformation", "Ending", "Rebirth", "Release"],
+            upright: "What's dying needs to die. Death rides in not as an enemy but as a liberator, clearing away what you've outgrown so the new can emerge. This is rarely about physical death—it's about the death of identities, relationships, beliefs, ways of being that no longer serve your evolution. Grieve what's passing. Honor it. And then release your grip. Transformation requires the dissolution of the old form. You cannot become the butterfly while clinging to the caterpillar.",
+            reversed: "Resistance to necessary endings keeps you in prolonged decay. The reversed Death indicates fear of change so strong that you're choosing the slow death of stagnation over the acute death of transformation. What are you refusing to let go of? What's already dead that you're still animating through force of will? Release is medicine."
+        },
+        {
+            name: "Temperance",
+            number: 14,
+            symbol: "⚗",
+            keywords: ["Alchemy", "Balance", "Integration", "Healing"],
+            upright: "The angel pours water between two cups, mixing opposites into a third thing that transcends both. Temperance is the alchemical process—dissolving, integrating, finding the middle path between extremes. You are being refined. This is the slow, patient work of integration, of bringing disparate parts of yourself into harmony. Healing happens not through force but through gentle, consistent rebalancing. Trust the process of becoming whole.",
+            reversed: "Imbalance, excess, or the refusal to moderate. The reversed Temperance may indicate addiction, extremism, or the swing between opposites without finding center. Are you all or nothing, feast or famine, work or collapse? The middle path requires discipline and self-knowledge. What needs to come into balance? Where are you avoiding the patient work of integration?"
+        },
+        {
+            name: "The Devil",
+            number: 15,
+            symbol: "🜏",
+            keywords: ["Shadow", "Bondage", "Materialism", "Liberation Through Awareness"],
+            upright: "The chains are loose—you could leave anytime. The Devil represents the bondage of unconscious patterns, addictions, attachments, and the shadow material you've been unwilling to face. But here's the secret: awareness is already freedom. By seeing the pattern, you've begun to break it. What has you in chains? What are you telling yourself you 'can't' do? Look closer. The Devil is the guardian of tremendous power, but you must be willing to face the darkness to claim it.",
+            reversed: "Freedom from bondage, or the recognition of how deep the chains go. The reversed Devil can indicate liberation, breaking free from addiction or toxic patterns. Or it can mean the shadow has gone so deep you can no longer see it—normalized dysfunction, unrecognized manipulation. The antidote is the same: ruthless self-honesty. What are you pretending not to know?"
+        },
+        {
+            name: "The Tower",
+            number: 16,
+            symbol: "🗲",
+            keywords: ["Destruction", "Revelation", "Liberation", "Divine Intervention"],
+            upright: "The lightning strikes and the false structure crumbles. The Tower is not punishment—it's liberation. What's being destroyed was built on faulty foundation, held together by illusion, or no longer big enough to contain who you're becoming. Yes, it's devastating. Yes, it's necessary. The Tower clears away what you would never have had the courage to release yourself. In the rubble, you'll find the truth that was always there, and from that truth, you can rebuild something real.",
+            reversed: "The Tower reversed may indicate avoiding the necessary destruction, trying to hold together what's already crumbling, or the slow collapse rather than the sudden strike. It can also mean you're in the aftermath, still in shock, not yet ready to rebuild. Give yourself time to grieve. The foundation revealed by the Tower's destruction is where your true work begins. Or: you saw it coming and you're bracing. The truth is still the truth, even when you resist it."
+        },
+        {
+            name: "The Star",
+            number: 17,
+            symbol: "✶",
+            keywords: ["Hope", "Healing", "Renewal", "Guidance"],
+            upright: "After the Tower's destruction, the Star appears—naked, vulnerable, and unafraid. She pours water onto the earth and into the pool, representing the flow of healing, the return of hope, the quiet certainty that you will not only survive but become more yourself than before. The Star is the first breath after a long submersion, the light that appears when you've surrendered to the darkness. You are being renewed. Trust it. Your hope is not naive; it's earned.",
+            reversed: "Despair, disconnection from hope, or the feeling that healing will never come. The reversed Star indicates exhaustion of spirit, loss of faith, or the inability to see the light that's already there. Sometimes it's spiritual bypass—trying to force hope before you've honored the grief. You cannot leap over the darkness into the light; you must walk through it. But the Star is still there, waiting for you to lift your eyes."
+        },
+        {
+            name: "The Moon",
+            number: 18,
+            symbol: "☾",
+            keywords: ["Illusion", "Intuition", "The Unconscious", "Fear"],
+            upright: "Not everything is as it seems. The Moon illuminates the path between the tame dog and the wild wolf, between the known and the unknown, through the landscape of dreams and the unconscious. This is the realm of intuition, but also of illusion—your fears may be projections, or they may be showing you something real. Trust your instincts, but verify. What's emerging from the depths? What do your dreams tell you? The Moon asks you to navigate by feel when the path is unclear.",
+            reversed: "Clarity beginning to emerge from confusion, or being lost in illusion so deep you can't find your way out. The reversed Moon can indicate deception (self or other), paranoia, or the dawning realization that you've been seeing things that aren't there—or not seeing things that are. It's time to turn on the lights. What are you afraid to see clearly? What's your intuition actually telling you beneath the fear?"
+        },
+        {
+            name: "The Sun",
+            number: 19,
+            symbol: "☉",
+            keywords: ["Joy", "Success", "Clarity", "Vitality"],
+            upright: "Pure, unfiltered radiance. The Sun is the card of simple joy, success that feels easy because it's aligned with your truth, and the clarity that comes when all illusions have been burned away. The child on the horse is naked and unashamed, riding with confidence and delight. This is you when you stop performing, stop hiding, stop trying to be anything other than what you are. Everything is illuminated. Everything grows. Receive this light.",
+            reversed: "Even the Sun has a shadow. Reversed, this card may indicate dampened vitality, success that feels hollow, or excessive ego. Are you performing joy to avoid grief? Insisting everything is fine when it's not? Or has your confidence tipped into arrogance, blinding you to what you don't know? Sometimes the reversed Sun is simply a cloudy day—temporary dimming of your natural radiance. It will return. Be patient with yourself."
+        },
+        {
+            name: "Judgement",
+            number: 20,
+            symbol: "📯",
+            keywords: ["Awakening", "Reckoning", "Rebirth", "Calling"],
+            upright: "The trumpet sounds and the dead rise—not to be judged by an external force, but to be called home to themselves. Judgement is the moment of reckoning when you're asked: are you living in alignment with your deepest truth? This is the call to your authentic vocation, your true work, the life that's been waiting for you to claim it. Past versions of self are being integrated. You are being reborn into fuller expression. The question is: will you answer the call?",
+            reversed: "Refusal of the call, harsh self-judgment, or waiting for external validation before you step into your truth. The reversed Judgement may indicate fear of being seen, imposter syndrome, or the belief that you're not ready (you never will be—readiness is a myth). It can also point to unresolved guilt, shame, or the need to forgive yourself or others before you can move forward. What are you waiting for permission to become?"
+        },
+        {
+            name: "The World",
+            number: 21,
+            symbol: "🜨",
+            keywords: ["Completion", "Integration", "Wholeness", "Mastery"],
+            upright: "The dance is complete. The World represents the fulfillment of the Fool's journey—not an ending, but a return to the beginning with full consciousness. You have integrated the lessons, embodied the wisdom, and arrived at a new level of wholeness. The four elements are in balance, the four corners of the mandala are held. This is mastery—not perfection, but deep competence, presence, and the recognition that you are both the dancer and the dance. Celebrate how far you've come. And prepare for the next spiral.",
+            reversed: "Incompletion, delayed success, or the recognition that you've been seeking completion outside yourself. The reversed World may indicate that one more piece of integration is needed before the cycle can close. Are you rushing to the finish line, cutting corners, leaving something unresolved? Or are you refusing to acknowledge the completion that's already happened, staying in motion to avoid stepping into your power? Both are forms of resistance. Let the cycle complete."
+        }
+    ],
+
+    wands: [
+        {
+            name: "Ace of Wands",
+            symbol: "🔥",
+            keywords: ["Creative spark", "Inspiration", "New passion", "Potential"],
+            upright: "A lightning bolt of pure creative potential. The Ace of Wands is the spark before the fire, the impulse toward action, the surge of life force that says 'yes, this.' It's the idea that won't leave you alone, the project that makes you feel alive, the direction your soul wants to move. This is raw creative energy—not yet formed, but potent. Say yes to what's calling.",
+            reversed: "Creative blocks, false starts, or passion without direction. The spark is there but it's not catching, or you're scattering your energy in too many directions. Sometimes the reversed Ace indicates burnout—trying to force inspiration when rest is needed."
+        },
+        {
+            name: "Two of Wands",
+            symbol: "🌍",
+            keywords: ["Planning", "Future vision", "Decision", "Exploration"],
+            upright: "You hold the world in your hands, surveying possibilities. The Two of Wands is the moment between inspiration and action—planning, envisioning, choosing your direction. You have the spark (Ace), now you must decide where to direct it. The future is being imagined into being. What do you want to create?",
+            reversed: "Analysis paralysis, fear of commitment, or planning without action. You may be waiting for perfect clarity before you move. It won't come. Choose a direction and adjust as you go."
+        },
+        {
+            name: "Three of Wands",
+            symbol: "⛵",
+            keywords: ["Expansion", "Foresight", "Momentum", "Progress"],
+            upright: "The ships have sailed—your work is in motion, expanding beyond what you can directly control. The Three of Wands represents the moment when your efforts begin to create their own momentum. You're seeing the results of your vision. Keep your eyes on the horizon. More is coming.",
+            reversed: "Delays, lack of foresight, or expansion that's happening too fast to integrate. Are you overextending? Have you prepared adequately for growth? Sometimes this indicates fear of success or self-sabotage when things start to work."
+        },
+        {
+            name: "Four of Wands",
+            symbol: "🏛️",
+            keywords: ["Celebration", "Homecoming", "Foundation", "Harvest"],
+            upright: "A moment of joy and celebration—you've built something stable and now you get to enjoy it. The Four of Wands is the harvest festival, the wedding, the homecoming. It's the recognition that your efforts have created something real. Let yourself celebrate. This foundation supports the next phase of growth.",
+            reversed: "Unstable foundations, lack of support, or the inability to receive celebration. Are you moving too fast to enjoy what you've built? Or is the foundation not as solid as it appears? This can also indicate homesickness or disconnection from your roots."
+        },
+        {
+            name: "Five of Wands",
+            symbol: "⚔️",
+            keywords: ["Conflict", "Competition", "Creative tension", "Testing"],
+            upright: "Five figures clash in what looks like chaos but may be creative sparring. The Five of Wands represents competition, conflict, the testing of ideas and abilities. This is not destructive—it's how you sharpen yourself. The friction generates heat, and heat forges. What's being tested in you right now? Can you engage without taking it personally?",
+            reversed: "Avoiding conflict, inner discord projected outward, or competition that's become destructive. Sometimes this indicates giving up too easily or refusing to stand your ground. Other times it's conflict for conflict's sake, ego battles that serve no one."
+        },
+        {
+            name: "Six of Wands",
+            symbol: "🏆",
+            keywords: ["Victory", "Recognition", "Success", "Leadership"],
+            upright: "You ride through the crowd, victorious. The Six of Wands is public recognition, earned success, the moment when your efforts are acknowledged. But notice: the recognition comes from embodying your truth, not from performing for approval. This is victory that feels aligned. Let yourself receive it.",
+            reversed: "Success that feels hollow, excessive need for external validation, or fear of visibility. Are you seeking recognition to prove your worth? Or hiding your success to avoid being seen? Sometimes this indicates delayed recognition—doing the work without the reward yet. Keep going."
+        },
+        {
+            name: "Seven of Wands",
+            symbol: "🛡️",
+            keywords: ["Defense", "Perseverance", "Standing your ground", "Challenge"],
+            upright: "You stand on higher ground, defending your position against challenge. The Seven of Wands is about holding your ground when your truth is being tested. This requires energy and courage, but you have the high ground—your position is strong. Don't back down from what you know is right.",
+            reversed: "Overwhelm, giving up, or defending a position that's no longer worth holding. Are you fighting battles that don't serve you? Or caving when you should stand firm? Sometimes the reversed Seven indicates exhaustion from too much defending. Strategic retreat may be wisdom."
+        },
+        {
+            name: "Eight of Wands",
+            symbol: "➶",
+            keywords: ["Speed", "Movement", "Communication", "Momentum"],
+            upright: "Arrows fly toward their target—swift movement, clear direction, unstoppable momentum. The Eight of Wands is everything happening at once, messages arriving, opportunities coming fast. This is the whoosh of air when things finally start moving after a period of stasis. Stay focused. Ride the energy.",
+            reversed: "Delays, miscommunication, or movement so fast you can't integrate it. Sometimes this indicates scattered energy or trying to force speed when patience is needed. Are you rushing? Slow down enough to aim."
+        },
+        {
+            name: "Nine of Wands",
+            symbol: "🔥",
+            keywords: ["Resilience", "Persistence", "Boundaries", "Last stand"],
+            upright: "Wounded but still standing, you guard what you've built. The Nine of Wands represents the resilience that comes from having survived previous battles. You're tired, yes, but you're not defeated. This is the final push before completion. Your boundaries are being tested. Hold them. You're closer than you think.",
+            reversed: "Paranoia, rigidity, or the inability to rest even when safe. Are you so defended that nothing can reach you—not even help? Sometimes the reversed Nine indicates giving up right before the breakthrough. Don't stop now."
+        },
+        {
+            name: "Ten of Wands",
+            symbol: "⚒️",
+            keywords: ["Burden", "Responsibility", "Completion", "Overwhelm"],
+            upright: "You carry ten wands toward home—the burden of success, of responsibility, of all you've taken on. The Ten of Wands represents the weight of completion, the recognition that you cannot carry everything alone. This load can be carried, but something needs to shift. Delegate. Release what's not yours to carry. You're almost home.",
+            reversed: "Collapse under the weight, refusal to delegate, or the recognition that you've taken on burdens that aren't yours. What can you put down? Where have you said yes when you meant no? The reversed Ten is an invitation to examine what you're carrying and why."
+        },
+        {
+            name: "Page of Wands",
+            symbol: "🌱",
+            keywords: ["Enthusiasm", "Exploration", "Messages", "New beginning"],
+            upright: "Young energy, enthusiastic and unafraid—the Page of Wands brings news of creative opportunities, the beginning of a passionate project, or the courage to explore new territory. This is the part of you that's willing to try, to play, to see what happens. Follow your curiosity.",
+            reversed: "Scattered enthusiasm, fear of looking foolish, or hesitation when boldness is needed. Are you talking about doing the thing rather than doing it? The reversed Page may also indicate immaturity or recklessness. Ground your enthusiasm in action."
+        },
+        {
+            name: "Knight of Wands",
+            symbol: "🐎",
+            keywords: ["Action", "Adventure", "Passion", "Impulsiveness"],
+            upright: "All fire, all movement, charging toward the horizon—the Knight of Wands is pure passionate action. This is the part of you that doesn't hesitate, doesn't second-guess, just moves. There's medicine in this boldness, but also danger. Are you moving toward something real, or just away from stillness?",
+            reversed: "Recklessness, burnout, or passion without purpose. The Knight reversed may indicate impulsive action you'll regret, or the opposite—hesitation when boldness is required. Channel the fire; don't let it consume you."
+        },
+        {
+            name: "Queen of Wands",
+            symbol: "👑",
+            keywords: ["Confidence", "Passion", "Leadership", "Charisma"],
+            upright: "She sits on her throne holding her wand and sunflower, radiant and self-possessed. The Queen of Wands is creative power fully owned—confidence that doesn't need to prove itself, passion that's sustainable, leadership that inspires. This is your sovereign creative self. Claim your throne.",
+            reversed: "Insecurity masked as aggression, jealousy, or disconnection from your power. The reversed Queen may indicate dimmed radiance, creative drought, or using your charisma to manipulate. Return to your center. Your power doesn't need to diminish others to shine."
+        },
+        {
+            name: "King of Wands",
+            symbol: "⚡",
+            keywords: ["Vision", "Leadership", "Mastery", "Entrepreneurship"],
+            upright: "The King of Wands is the visionary leader, the entrepreneur, the one who sees possibility and has the will and skill to make it real. This is creative mastery—not just the spark, but the sustained fire. You have the vision and the capacity to execute it. Lead.",
+            reversed: "Tyranny, ego inflation, or vision without follow-through. Are you all talk and no action? Or wielding power carelessly? The reversed King may also indicate burnout from trying to do everything yourself. Mastery includes knowing when to delegate."
+        }
+    ],
+
+    cups: [
+        {
+            name: "Ace of Cups",
+            symbol: "💧",
+            keywords: ["New love", "Emotional opening", "Intuition", "Spiritual connection"],
+            upright: "The cup overflows with water—pure emotional and spiritual potential. The Ace of Cups is the opening of the heart, new love (for self, other, or life itself), the beginning of deep feeling after a time of numbness. This is grace, the gift of renewed capacity to feel. Let it pour through you.",
+            reversed: "Emotional blockage, closed heart, or overwhelming emotion without container. Are you numbing to avoid pain? Or drowning in feeling? The reversed Ace asks: what needs to happen for your heart to safely open again?"
+        },
+        {
+            name: "Two of Cups",
+            symbol: "💞",
+            keywords: ["Partnership", "Connection", "Mutual respect", "Union"],
+            upright: "Two figures exchange cups in recognition and respect. The Two of Cups represents partnership—romantic, business, friendship, or the internal union of parts of self. This is authentic connection based on mutual seeing. You don't have to perform. You can be yourself and be met.",
+            reversed: "Disconnection, imbalance in relationship, or the end of a partnership. Are you trying to force connection where there's fundamental misalignment? Or avoiding the vulnerability real intimacy requires? Sometimes this indicates self-abandonment in relationship—losing yourself to keep the other."
+        },
+        {
+            name: "Three of Cups",
+            symbol: "🎉",
+            keywords: ["Celebration", "Community", "Friendship", "Abundance"],
+            upright: "Three women raise their cups in joyful celebration—community, friendship, the abundance that comes from sharing. The Three of Cups is the reminder that you don't have to do this alone. Your people are out there. Celebrate with them. Let yourself be held by community.",
+            reversed: "Isolation, superficial connections, or community that's become toxic. Are you hiding from others? Or surrounding yourself with people who don't really see you? The reversed Three may indicate the end of a friend group, or the recognition that not all gatherings nourish you."
+        },
+        {
+            name: "Four of Cups",
+            symbol: "🌳",
+            keywords: ["Contemplation", "Apathy", "Reevaluation", "Meditation"],
+            upright: "A figure sits under a tree, arms crossed, ignoring the cups offered—apathy, contemplation, or the necessary withdrawal to reevaluate. The Four of Cups asks: are you so focused on what's not working that you're missing what's being offered? Or is this withdrawal necessary to hear yourself think? Discernment is required.",
+            reversed: "New awareness, readiness to engage, or the recognition that apathy has become a defense. What are you ready to receive now? What opportunities have you been ignoring? The reversed Four invites you back into life."
+        },
+        {
+            name: "Five of Cups",
+            symbol: "😢",
+            keywords: ["Loss", "Grief", "Disappointment", "Regret"],
+            upright: "Three cups have spilled; two remain standing—grief for what's lost, but the resources to move forward still exist. The Five of Cups is the necessary mourning period after loss. You're allowed to grieve. And when you're ready, there are still two cups waiting. Turn around.",
+            reversed: "Stuck in grief, unable to see what remains, or bypassing necessary mourning. Are you letting loss define you? Or rushing to 'get over it' before you've honored what ended? Both are forms of resistance. Grief has its own timeline."
+        },
+        {
+            name: "Six of Cups",
+            symbol: "🌼",
+            keywords: ["Nostalgia", "Innocence", "Childhood", "Reunion"],
+            upright: "Children exchange flowers in a village from the past—nostalgia, innocence, the return of something from your history that needs attention now. The Six of Cups may indicate healing childhood wounds, reconnecting with your inner child, or a person from your past reappearing. What does your younger self need from you now?",
+            reversed: "Living in the past, idealization of what was, or unhealed childhood patterns running your present. Are you trying to recreate something that's gone? Or finally ready to release old stories? The reversed Six asks you to integrate the past, not live in it."
+        },
+        {
+            name: "Seven of Cups",
+            symbol: "☁️",
+            keywords: ["Choices", "Illusion", "Fantasy", "Confusion"],
+            upright: "Seven cups float in clouds, each offering something different—possibilities, illusions, choices that overwhelm. The Seven of Cups represents the confusion of too many options, or fantasies that keep you from taking action. Not all that glitters is gold. Which cup is real? Ground your vision in reality before you choose.",
+            reversed: "Clarity emerging, or being completely lost in fantasy. The reversed Seven can indicate finally making a choice, or becoming so confused that paralysis sets in. It may also point to disillusionment—seeing through the illusions to what's actually true. Choose wisely."
+        },
+        {
+            name: "Eight of Cups",
+            symbol: "🚶",
+            keywords: ["Walking away", "Spiritual search", "Letting go", "Transition"],
+            upright: "A figure walks away from eight stacked cups toward the mountains—the choice to leave what no longer serves, even when it's not 'wrong.' The Eight of Cups is the spiritual search that requires leaving the known. This isn't failure; it's evolution. What your soul needs is calling you forward. Go.",
+            reversed: "Fear of leaving, staying in what's comfortable but dead, or wandering without direction. Are you avoiding the journey because it means releasing what's known? Or have you been walking so long you've forgotten why you left? Sometimes the reversed Eight means it's time to return. Check in with your truth."
+        },
+        {
+            name: "Nine of Cups",
+            symbol: "🍷",
+            keywords: ["Satisfaction", "Contentment", "Wishes fulfilled", "Pleasure"],
+            upright: "The 'wish card'—satisfaction, contentment, the fulfillment of desires. The Nine of Cups represents emotional abundance, getting what you wanted, the capacity to receive pleasure without guilt. You're allowed to feel good. You're allowed to want things and have them. Enjoy this moment.",
+            reversed: "Greed, dissatisfaction despite having everything, or pleasure that feels empty. Are you chasing the next thing before you've enjoyed this one? Or is this satisfaction masking a deeper unhappiness? True contentment comes from alignment, not acquisition."
+        },
+        {
+            name: "Ten of Cups",
+            symbol: "🌈",
+            keywords: ["Emotional fulfillment", "Family", "Harmony", "Completion"],
+            upright: "A rainbow arches over a family in harmony—emotional fulfillment, the completion of the Cups journey, lasting happiness based on authentic connection. The Ten of Cups is the reminder that joy is possible, that wholeness can be embodied, that your heart's deepest desires for love and belonging can be fulfilled. This is what you've been building toward.",
+            reversed: "Broken family systems, surface harmony hiding dysfunction, or the recognition that the picture-perfect life doesn't bring the happiness you expected. What's the gap between the image and the reality? The reversed Ten invites you to create authentic connection, not perform it."
+        },
+        {
+            name: "Page of Cups",
+            symbol: "🐠",
+            keywords: ["Intuitive messages", "Creativity", "Sensitivity", "New feelings"],
+            upright: "A young figure holds a cup with a fish emerging—intuitive messages, creative inspiration, the beginning of emotional awareness. The Page of Cups is your inner artist, your dreamer, the part that receives impressions from the unseen. Pay attention to your dreams, your feelings, the subtle signals. Something is trying to reach you.",
+            reversed: "Emotional immaturity, ignoring intuition, or being overwhelmed by sensitivity. Are you dismissing your feelings as 'too much'? Or indulging in them without discernment? The reversed Page asks you to honor your sensitivity while developing emotional intelligence."
+        },
+        {
+            name: "Knight of Cups",
+            symbol: "🏇",
+            keywords: ["Romance", "Charm", "Following the heart", "Idealism"],
+            upright: "The romantic, the dreamer, the one who follows the heart no matter where it leads—the Knight of Cups brings proposals, romantic gestures, invitations to follow your passion. This is beautiful and necessary, but ask: is this sustainable? Is this real? Or is this the performance of romance? Feel deeply, but keep your feet on the ground.",
+            reversed: "Moodiness, unrealistic expectations, or using charm to manipulate. The reversed Knight may indicate someone who's all promise and no follow-through, or your own tendency to romanticize situations beyond reality. Ground your heart in truth."
+        },
+        {
+            name: "Queen of Cups",
+            symbol: "🔮",
+            keywords: ["Emotional depth", "Intuition", "Compassion", "Psychic ability"],
+            upright: "She sits by the water, holding her cup with complete presence—emotional mastery, deep intuition, compassion that's been earned through feeling everything. The Queen of Cups is your capacity for profound empathy without losing yourself, psychic sensitivity that serves, emotional depth that's safe to dive into. You can hold it all.",
+            reversed: "Emotional overwhelm, codependency, or using intuition to manipulate. Are you drowning in others' feelings? Giving to get? The reversed Queen has lost her boundaries—she's become the ocean instead of the vessel. You can be compassionate without abandoning yourself."
+        },
+        {
+            name: "King of Cups",
+            symbol: "🌊",
+            keywords: ["Emotional balance", "Wisdom", "Diplomacy", "Maturity"],
+            upright: "He rules the emotional realm with wisdom and balance—the King of Cups is emotional mastery, the capacity to feel deeply while maintaining equilibrium. This is the mature masculine relationship with feeling—present, compassionate, but not swept away. You can be in the waves without becoming them. This is hard-won wisdom. Trust it.",
+            reversed: "Emotional manipulation, suppression, or volatility masked as control. The reversed King either rules through emotional coercion or has shut down feeling entirely in the name of 'rationality.' Both are imbalanced. True mastery includes the full spectrum of feeling, wisely held."
+        }
+    ],
+
+    swords: [
+        {
+            name: "Ace of Swords",
+            symbol: "⚔️",
+            keywords: ["Clarity", "Truth", "Mental breakthrough", "New perspective"],
+            upright: "A hand emerges from clouds holding a sword crowned with laurel—pure mental clarity, breakthrough, the cutting away of illusion to reveal truth. The Ace of Swords is the moment when suddenly everything makes sense, when confusion dissolves and you see clearly. This is truth that liberates. Speak it.",
+            reversed: "Confusion, mental fog, or truth weaponized. The sword cuts, but are you using it to liberate or to wound? The reversed Ace may indicate clarity that's not yet ready to be spoken, or intellectual understanding without embodied wisdom. Think clearly, but feel too."
+        },
+        {
+            name: "Two of Swords",
+            symbol: "⚖️",
+            keywords: ["Stalemate", "Avoidance", "Difficult choice", "Peace"],
+            upright: "A blindfolded figure holds two swords crossed—stalemate, the refusal to choose because both options feel painful. The Two of Swords is the necessary pause before decision, or the avoidance of truth you're not ready to face. You cannot stay here forever. Eventually the blindfold must come off.",
+            reversed: "Decision made, or paralysis so deep you can no longer see options. The reversed Two can indicate finally choosing, even when both paths are difficult. Or it can mean you've been sitting in indecision so long that the choice has been made for you. Face what you're avoiding."
+        },
+        {
+            name: "Three of Swords",
+            symbol: "💔",
+            keywords: ["Heartbreak", "Grief", "Painful truth", "Release"],
+            upright: "Three swords pierce a heart—unavoidable pain, heartbreak, the grief that comes when truth destroys illusion. The Three of Swords is not punishment; it's the pain of growth, of facing what you've been denying, of feeling what you've been numbing. This hurts. And it's necessary. Let yourself break open.",
+            reversed: "Healing from heartbreak, or refusing to face pain. The reversed Three can indicate recovery, the gradual removal of the swords, the beginning of mending. Or it can mean the pain has gone so deep you've become numb. Both are stages of healing. Which are you in?"
+        },
+        {
+            name: "Four of Swords",
+            symbol: "🛌",
+            keywords: ["Rest", "Recovery", "Contemplation", "Retreat"],
+            upright: "A figure lies in repose, swords arranged around them—necessary rest, recovery from battle, contemplation before the next move. The Four of Swords is not giving up; it's strategic retreat. You cannot fight effectively when exhausted. Rest is productive. Integration requires stillness. Let yourself recover.",
+            reversed: "Restlessness, burnout, or resistance to necessary rest. Are you forcing movement when stillness is needed? Or have you been resting so long that stagnation has set in? The reversed Four asks: what's the right balance between rest and action for you right now?"
+        },
+        {
+            name: "Five of Swords",
+            symbol: "⚔️",
+            keywords: ["Conflict", "Defeat", "Hollow victory", "Betrayal"],
+            upright: "A figure gathers swords while others walk away—victory at what cost? The Five of Swords represents conflict where everyone loses, winning battles that don't matter, or the recognition that being 'right' isn't the same as being connected. Are you collecting weapons or building bridges? Some battles aren't worth winning.",
+            reversed: "Making peace, or refusing to engage in destructive conflict. The reversed Five can indicate the wisdom to walk away from fights that serve no one, or the cowardice of avoiding necessary confrontation. Which is this? Choose wisely."
+        },
+        {
+            name: "Six of Swords",
+            symbol: "⛵",
+            keywords: ["Transition", "Moving on", "Mental shift", "Recovery"],
+            upright: "A boat carries passengers across water toward calmer shores—transition, the journey from turbulence to peace, moving on from what was. The Six of Swords is the recognition that staying would be worse than the uncertainty of leaving. You're moving toward healing, even if you can't yet see the shore. Trust the journey.",
+            reversed: "Resistance to necessary transition, or moving forward without processing what happened. Are you trying to rush healing? Or refusing to leave what's clearly over? The reversed Six asks you to honor the transition, not bypass it."
+        },
+        {
+            name: "Seven of Swords",
+            symbol: "🏃",
+            keywords: ["Strategy", "Deception", "Stealth", "Independence"],
+            upright: "A figure sneaks away with swords—strategy, stealth, doing what needs to be done without permission. The Seven of Swords can indicate necessary cunning, strategic thinking, or deception (of self or others). Are you being clever or dishonest? Sometimes you have to take what's yours without waiting for approval. Sometimes that's theft. Know the difference.",
+            reversed: "Coming clean, getting caught, or the recognition that you've been lying to yourself. The reversed Seven is the moment when deception can no longer be sustained. What truth have you been avoiding? What are you finally ready to admit?"
+        },
+        {
+            name: "Eight of Swords",
+            symbol: "🔒",
+            keywords: ["Restriction", "Trapped", "Limiting beliefs", "Victimhood"],
+            upright: "A blindfolded figure stands bound among swords—trapped, but the bonds are loose and the swords aren't actually blocking the way. The Eight of Swords is the prison of your own mind, limiting beliefs that feel like truth, the victim story that keeps you small. You have more freedom than you think. Remove the blindfold. Walk out.",
+            reversed: "Liberation, or being so trapped you can no longer see the way out. The reversed Eight can indicate breaking free from limiting beliefs, releasing the victim story, reclaiming your power. Or it can mean the prison has become so normalized you think this is just how life is. Which is it?"
+        },
+        {
+            name: "Nine of Swords",
+            symbol: "😰",
+            keywords: ["Anxiety", "Nightmares", "Worry", "Mental anguish"],
+            upright: "A figure sits in bed, head in hands, nine swords on the wall—anxiety, nightmares, the 3am panic when all your fears feel real. The Nine of Swords is mental anguish, but notice: it's dark and you're alone with your thoughts. How much of this is real and how much is the story you're telling yourself? Your thoughts are not facts. Breathe.",
+            reversed: "Recovery from anxiety, or being so consumed by worry that you can't function. The reversed Nine can indicate the worst is over, the nightmares are easing, you're beginning to see clearly again. Or it can mean you've hit bottom with anxiety and help is needed. Be honest about which this is."
+        },
+        {
+            name: "Ten of Swords",
+            symbol: "⚰️",
+            keywords: ["Ending", "Betrayal", "Rock bottom", "New dawn"],
+            upright: "A figure lies with ten swords in their back, but the sun is rising—rock bottom, betrayal, the definitive ending. The Ten of Swords is as bad as it gets, but that also means it cannot get worse. You've hit bottom. Now the only direction is up. This ending is absolute, which means a new beginning is inevitable. The swords cannot be removed one by one; you must rise and leave them behind.",
+            reversed: "Recovery, or refusing to accept that it's over. The reversed Ten can indicate resurrection, the beginning of healing from betrayal or disaster. Or it can mean you're still lying there, trying to make something work that's clearly dead. Get up. Leave the swords. Walk toward the light."
+        },
+        {
+            name: "Page of Swords",
+            symbol: "🗡️",
+            keywords: ["Curiosity", "Mental agility", "Messages", "Vigilance"],
+            upright: "A young figure holds a sword alert and ready—curiosity, mental agility, the part of you that questions everything. The Page of Swords is the investigator, the student, the one who wants to understand how things work. This is intellectual hunger, but without wisdom's tempering. Stay curious, but develop discernment.",
+            reversed: "Overthinking, gossip, or using intellect to avoid feeling. The reversed Page may indicate analysis paralysis, cutting remarks disguised as honesty, or being so caught in mental loops that action becomes impossible. Think less. Feel more. Do something."
+        },
+        {
+            name: "Knight of Swords",
+            symbol: "🐎",
+            keywords: ["Action", "Ambition", "Rushing", "Assertiveness"],
+            upright: "Charging forward with sword raised—the Knight of Swords is pure mental energy in motion, ambitious, direct, sometimes ruthless in pursuit of truth. This is the part of you that doesn't hesitate, doesn't sugarcoat, just acts. There's medicine in this clarity, but also danger. Are you being decisive or reckless? Honest or cruel?",
+            reversed: "Impulsive action you'll regret, or hesitation when boldness is needed. The reversed Knight may indicate someone who's all aggression and no strategy, or your own tendency to charge in without thinking. Slow down enough to aim. Truth can be spoken without violence."
+        },
+        {
+            name: "Queen of Swords",
+            symbol: "👑",
+            keywords: ["Clear boundaries", "Independence", "Honesty", "Discernment"],
+            upright: "She sits alone on her throne, sword upright, unflinching—the Queen of Swords is clear boundaries, hard-won wisdom, honesty that's been earned through pain. She's learned to think clearly without being cruel, to stand alone without being isolated, to see truth without becoming cynical. This is your sovereign mind. Use it wisely.",
+            reversed: "Bitterness, cruelty, or boundaries so rigid that nothing can reach you. The reversed Queen has been hurt and decided never to be vulnerable again. But the sword that protects can also isolate. Can you be discerning without being cold? Can you protect yourself without punishing others?"
+        },
+        {
+            name: "King of Swords",
+            symbol: "⚖️",
+            keywords: ["Authority", "Logic", "Truth", "Ethical power"],
+            upright: "The King of Swords rules with logic, ethics, and unwavering commitment to truth. This is intellectual mastery, the capacity to see clearly and act justly, authority that serves truth rather than ego. You have the clarity and the courage to speak what's real. Use this power responsibly.",
+            reversed: "Tyranny of logic, cruelty disguised as truth, or abuse of intellectual authority. The reversed King uses his mind as a weapon, values being right over being kind, or enforces rules without wisdom. Logic without compassion becomes cold. Truth without love becomes violence. Balance both."
+        }
+    ],
+
+    pentacles: [
+        {
+            name: "Ace of Pentacles",
+            symbol: "💰",
+            keywords: ["New opportunity", "Manifestation", "Prosperity", "Groundedness"],
+            upright: "A hand offers a golden pentacle above a lush garden—new material opportunity, the beginning of prosperity, or the seed of something that will grow into tangible abundance. The Ace of Pentacles is the universe saying 'yes' in practical form. This could work. This could be real. Plant the seed.",
+            reversed: "Missed opportunity, financial insecurity, or lack of grounding. The reversed Ace may indicate fear of scarcity blocking abundance, or a focus on material gain without spiritual alignment. What's your relationship with receiving? With earth? With your body?"
+        },
+        {
+            name: "Two of Pentacles",
+            symbol: "∞",
+            keywords: ["Balance", "Adaptability", "Juggling", "Flow"],
+            upright: "A figure dances while juggling two pentacles—balance in motion, adaptability, managing multiple priorities with grace. The Two of Pentacles is not static balance but dynamic flow. You're keeping all the balls in the air. This takes skill and presence. Stay flexible.",
+            reversed: "Overwhelm, imbalance, or trying to do too much. The reversed Two indicates you're dropping balls, losing the rhythm, or spreading yourself so thin that nothing gets your full attention. What needs to be released so you can focus on what matters most?"
+        },
+        {
+            name: "Three of Pentacles",
+            symbol: "🏗️",
+            keywords: ["Collaboration", "Skill", "Teamwork", "Planning"],
+            upright: "Three figures collaborate on building a cathedral—teamwork, skill development, the recognition that mastery requires both talent and collaboration. The Three of Pentacles is the apprentice learning from masters, the team working together toward something greater than individual effort could achieve. Your skills are needed. Contribute them.",
+            reversed: "Lack of collaboration, skills not recognized, or poor teamwork. Are you trying to do everything alone when partnership would serve better? Or are you in a team where your contributions aren't valued? The reversed Three asks: where's the misalignment?"
+        },
+        {
+            name: "Four of Pentacles",
+            symbol: "🔒",
+            keywords: ["Security", "Control", "Saving", "Scarcity"],
+            upright: "A figure clutches four pentacles tightly—security, control, the desire to hold onto what you have. The Four of Pentacles can indicate wise saving and protection of resources, or scarcity thinking that prevents flow. Are you being prudent or fearful? What are you afraid to let go of?",
+            reversed: "Generosity, or loss of control over resources. The reversed Four can indicate releasing scarcity thinking, opening to flow, sharing what you have. Or it can mean financial loss, lack of boundaries with money, or spending beyond your means. Find the balance between hoarding and hemorrhaging."
+        },
+        {
+            name: "Five of Pentacles",
+            symbol: "❄️",
+            keywords: ["Hardship", "Poverty", "Isolation", "Spiritual wealth"],
+            upright: "Two figures struggle in snow past a lighted church window—material hardship, feeling left out in the cold, isolation. But notice: help is right there in the lighted window. The Five of Pentacles asks: are you so focused on what you lack that you're missing what's available? Sometimes this card indicates spiritual wealth found through material poverty. What's the teaching here?",
+            reversed: "Recovery from hardship, or refusing to ask for help. The reversed Five can indicate the worst is over, help has arrived, you're moving back toward stability. Or it means you're suffering needlessly because pride prevents you from accepting assistance. Which is it?"
+        },
+        {
+            name: "Six of Pentacles",
+            symbol: "⚖️",
+            keywords: ["Generosity", "Giving and receiving", "Balance", "Charity"],
+            upright: "A figure with scales gives to those in need—generosity, balanced exchange, the flow of resources between those who have and those who need. The Six of Pentacles is reciprocity, the recognition that abundance flows through sharing, that giving and receiving are one movement. Are you the giver or the receiver right now? Both are necessary.",
+            reversed: "Imbalanced exchange, strings attached, or refusing to receive. The reversed Six may indicate charity that creates dependency, giving to control, or being unable to receive support. True generosity has no agenda. True receiving has no shame."
+        },
+        {
+            name: "Seven of Pentacles",
+            symbol: "🌾",
+            keywords: ["Assessment", "Patience", "Long-term vision", "Harvest"],
+            upright: "A figure pauses to assess the growing garden—patience, long-term thinking, pausing to evaluate whether your efforts are bearing fruit. The Seven of Pentacles is the moment mid-journey when you ask: is this working? Should I continue, pivot, or start over? Trust the slow work of growth, but be willing to course-correct if needed.",
+            reversed: "Impatience, lack of rewards for effort, or abandoning projects too soon. The reversed Seven may indicate frustration that results aren't coming fast enough, or the recognition that you've been watering dead soil. Which is it? Patience or stubbornness?"
+        },
+        {
+            name: "Eight of Pentacles",
+            symbol: "⚒️",
+            keywords: ["Mastery", "Dedication", "Skill development", "Diligence"],
+            upright: "A craftsperson works diligently at their bench—dedication to craft, skill development, the patient work of mastery. The Eight of Pentacles is showing up day after day, refining your skills, honoring the process. Mastery is not a destination; it's a practice. Keep working.",
+            reversed: "Perfectionism, meaningless work, or lack of focus. The reversed Eight may indicate working hard at something that doesn't feed your soul, or being so focused on perfection that you never finish anything. Is this craftsmanship or compulsion? Meaningful work or distraction?"
+        },
+        {
+            name: "Nine of Pentacles",
+            symbol: "🦜",
+            keywords: ["Independence", "Self-sufficiency", "Luxury", "Accomplishment"],
+            upright: "A woman stands alone in her abundant garden, falcon on her wrist—self-sufficiency, independence, the luxury that comes from your own efforts. The Nine of Pentacles is enjoying the fruits of your labor, standing in your own abundance, needing no one's permission or validation. You did this. Enjoy it.",
+            reversed: "Dependence, overwork without pleasure, or wealth that feels empty. The reversed Nine may indicate working so hard to build security that you can't enjoy it, or financial dependence that compromises your freedom. What's the point of abundance if you can't receive it?"
+        },
+        {
+            name: "Ten of Pentacles",
+            symbol: "🏰",
+            keywords: ["Legacy", "Wealth", "Family", "Completion"],
+            upright: "Multiple generations gather in prosperity—legacy, lasting wealth, the completion of the Pentacles journey. The Ten of Pentacles is building something that outlasts you, creating security for those who come after, the recognition that true wealth includes but transcends money. What are you building that will remain?",
+            reversed: "Financial loss, family conflict over money, or the recognition that material wealth doesn't guarantee happiness. The reversed Ten may indicate inheritance issues, broken family systems, or the discovery that the picture of prosperity hides dysfunction. What's the true foundation here?"
+        },
+        {
+            name: "Page of Pentacles",
+            symbol: "📚",
+            keywords: ["Study", "Ambition", "New venture", "Manifestation"],
+            upright: "A young figure holds a pentacle, studying it carefully—new venture, the beginning of learning a practical skill, ambition grounded in reality. The Page of Pentacles is your inner student, eager to learn, willing to start at the beginning, curious about how things actually work. Start learning. Start building. Results will come.",
+            reversed: "Procrastination, lack of focus, or learning without application. The reversed Page may indicate all study and no practice, or impractical dreams without grounding in reality. At some point you have to stop researching and start doing. Is that point now?"
+        },
+        {
+            name: "Knight of Pentacles",
+            symbol: "🐎",
+            keywords: ["Dedication", "Reliability", "Routine", "Patience"],
+            upright: "Steady, methodical, moving slowly but surely forward—the Knight of Pentacles is reliability, dedication, the part of you that shows up day after day without drama. This is the slow work of building something real. There's no shortcut. There's only the next right step, taken consistently. Trust the process.",
+            reversed: "Stagnation, stubbornness, or perfectionism that prevents progress. The reversed Knight may indicate being so careful that you never actually move, or working hard at something that's going nowhere. Is this patience or avoidance? Diligence or stuckness?"
+        },
+        {
+            name: "Queen of Pentacles",
+            symbol: "👑",
+            keywords: ["Nurturing", "Abundance", "Practicality", "Groundedness"],
+            upright: "She sits in her lush garden, pentacle in lap, completely grounded and present—the Queen of Pentacles is embodied abundance, practical wisdom, the capacity to create beauty and security while remaining generous. She knows how to nurture without depleting herself, how to be in the body, how to work with the earth. This is sovereign presence in material form.",
+            reversed: "Self-neglect, overgiving, or disconnection from body and earth. The reversed Queen may indicate caretaking everyone but yourself, or being so focused on productivity that you've lost touch with pleasure, rest, and the body's wisdom. You cannot pour from an empty cup. Nurture yourself first."
+        },
+        {
+            name: "King of Pentacles",
+            symbol: "💎",
+            keywords: ["Wealth", "Leadership", "Security", "Generosity"],
+            upright: "The King of Pentacles is material mastery—wealth wisely managed, leadership that creates security for others, the capacity to build lasting structures that serve life. This is the archetype of the generous benefactor, the wise steward, the one who understands that true wealth is meant to flow and create more abundance. You have the resources and the wisdom to lead. Use both.",
+            reversed: "Greed, materialism, or financial manipulation. The reversed King may indicate someone who uses wealth to control, who equates net worth with self-worth, or who has lost touch with any values beyond accumulation. Money is a tool, not an identity. What are you building it for?"
+        }
+    ]
+};
+
+// ============================================================================
+// PART 2: UNIVERSAL PROSPERITY DECK - Complete 78 Cards
+// ============================================================================
+
+const prosperityDeck = {
+    majorArcana: [
+        {
+            name: "The Fool",
+            number: 0,
+            symbol: "🌀",
+            keywords: ["New venture", "Calculated risk", "Beginner's mind", "Innovation"],
+            upright: "Every successful business, every fortune, every career shift began with someone willing to take the first step without knowing the outcome. The Fool in prosperity terms is the entrepreneur, the pivot, the leap into a new market. You don't need to have it all figured out—you need to start. The best time to begin was yesterday; the second best time is now. Your inexperience is an asset; you see possibilities others have trained themselves not to see.",
+            reversed: "Recklessness with resources, starting without adequate preparation, or paralysis disguised as caution. Are you leaping without looking at your numbers? Or are you hiding behind 'more research' when you know enough to begin? Calculated risk requires both calculation and risk."
+        },
+        {
+            name: "The Magician",
+            number: 1,
+            symbol: "∞",
+            keywords: ["Skills monetized", "Resourcefulness", "Taking action", "Communication"],
+            upright: "You already have everything you need to create value. The Magician represents the moment you realize your skills, knowledge, and resources—when properly arranged—can generate income. This is not about having more; it's about using what you have more intentionally. Your ability to communicate, to organize, to take focused action: these are your tools. The money is already in motion; you're learning to direct the flow.",
+            reversed: "All talk, no action. Scattered focus creating minimal results. Or using your skills to manipulate rather than create genuine value. Are you clear on what problem you're solving? Who needs what you have? Get specific, then execute."
+        },
+        {
+            name: "The High Priestess",
+            number: 2,
+            symbol: "☽",
+            keywords: ["Market intuition", "Timing", "Strategy", "Hidden information"],
+            upright: "The best business decisions often come from intuition backed by information. The High Priestess is your capacity to read between the lines of a contract, to sense when timing is right, to know what's not being said in a negotiation. Trust your gut about opportunities and people—it's processing more data than your conscious mind can track. Sometimes the smartest move is to wait and watch.",
+            reversed: "Ignoring red flags in business relationships, making decisions on wishful thinking rather than reality, or refusing to do due diligence. Intuition is powerful, but verify. What are you pretending not to know about this deal, this person, this venture?"
+        },
+        {
+            name: "The Empress",
+            number: 3,
+            symbol: "♀",
+            keywords: ["Abundance", "Creation", "Passive income", "Growth"],
+            upright: "The Empress represents businesses that grow almost organically, ideas that bear fruit, systems that generate income while you sleep. This is the principle of creation—plant good seeds in good soil, tend them consistently, and abundance follows. You're in a fertile period. What you launch now has unusual potential to thrive. Focus on quality, sustainability, and let natural growth happen.",
+            reversed: "Creative blocks in your business, trying to force growth, or depleting your resources through over-giving. Are you undercharging? Over-delivering without compensation? Abundance requires both generosity and boundaries. You can't give away everything and expect to thrive."
+        },
+        {
+            name: "The Emperor",
+            number: 4,
+            symbol: "♂",
+            keywords: ["Structure", "Leadership", "Systems", "Authority"],
+            upright: "Sustainable wealth requires systems, boundaries, and strategic planning. The Emperor is the CEO energy within you—the capacity to create frameworks that scale, to make hard decisions, to lead with clarity. Build the infrastructure before you need it. Document your processes. Create systems that work without you. This is how you move from freelancer to business owner, from employee to entrepreneur.",
+            reversed: "Tyrannical leadership, over-control that stifles innovation, or complete lack of structure creating chaos. Are your systems serving the business or has bureaucracy become the point? Or have you avoided building any structure at all, hoping chaos will somehow organize itself? Neither works."
+        },
+        {
+            name: "The Hierophant",
+            number: 5,
+            symbol: "⛧",
+            keywords: ["Mentorship", "Industry standards", "Credentials", "Teaching"],
+            upright: "Some knowledge is worth paying for. The Hierophant represents mentors, masterminds, the wisdom of those who've walked the path before you. You may be called to invest in learning from someone who's already achieved what you want, or to become the teacher yourself. There's gold in traditional business wisdom—don't reinvent wheels that already turn smoothly.",
+            reversed: "Following outdated business models, paying for advice from people without real results, or becoming so wedded to 'how it's always been done' that you miss emerging opportunities. Question the gurus. Verify their track records. Then take what works and leave the rest."
+        },
+        {
+            name: "The Lovers",
+            number: 6,
+            symbol: "⚤",
+            keywords: ["Alignment", "Partnerships", "Values", "Choice"],
+            upright: "Every business decision is a values decision. The Lovers asks: does this opportunity align with who you are and who you're becoming? Not all money is good money. Not all partnerships serve you. Choose opportunities that reflect your values. The right collaborations multiply both impact and income; the wrong ones drain both. Alignment is profitable.",
+            reversed: "Partnerships built on misaligned values, choosing money over integrity, or self-betrayal for financial gain. What are you compromising to make this work? Is it worth it? Sometimes walking away from money is the most profitable decision you'll ever make."
+        },
+        {
+            name: "The Chariot",
+            number: 7,
+            symbol: "⊕",
+            keywords: ["Drive", "Momentum", "Competitive advantage", "Victory"],
+            upright: "You have competing priorities and you're harnessing them into forward motion. The Chariot is focused determination—knowing your destination and moving toward it with disciplined energy. This is the sprint phase, the launch, the period where your concentrated effort creates breakthrough. You have what it takes to win this. Stay focused.",
+            reversed: "Scattered energy creating no real progress, burning out from trying to do everything, or aggressive pursuit of success that damages relationships and reputation. Slow down. Integrate. Sustainable success requires pacing, not just pushing."
+        },
+        {
+            name: "Strength",
+            number: 8,
+            symbol: "∞",
+            keywords: ["Resilience", "Sustainable effort", "Inner power", "Patience"],
+            upright: "Building wealth is a marathon, not a sprint. Strength represents the steady, patient, persistent effort that compounds over time. You don't need to force or dominate—you need to show up consistently with your best work. Your resilience is your competitive advantage. Most people quit; you won't. That's the difference.",
+            reversed: "Burnout, forcing what isn't working, or giving up too easily when results are slow. Are you pushing so hard you're breaking? Or collapsing at the first obstacle? Strength is not brute force—it's intelligent persistence. Adjust your strategy, not your commitment."
+        },
+        {
+            name: "The Hermit",
+            number: 9,
+            symbol: "☆",
+            keywords: ["Expertise", "Niche specialization", "Solo work", "Focus"],
+            upright: "The riches are in the niches. The Hermit represents deep specialization, becoming known for one thing done exceptionally well. This might be a period of solitary work—developing your skills, creating your product, building something that requires focused attention away from the noise. Your expertise is your gold. Mine it deeply.",
+            reversed: "Isolation that's cutting you off from opportunities, over-specialization that limits your market, or refusing to network and collaborate. Expertise matters, but so does visibility. At some point you have to bring your work to the world."
+        },
+        {
+            name: "Wheel of Fortune",
+            number: 10,
+            symbol: "☸",
+            keywords: ["Market cycles", "Timing", "Luck", "Opportunity"],
+            upright: "Markets move in cycles. Opportunities come and go. The Wheel of Fortune reminds you that both windfalls and setbacks are temporary. When you're up, save and invest. When you're down, learn and adapt. The wheel always turns. Position yourself to benefit from the next upswing. Timing matters, but so does being ready when timing aligns.",
+            reversed: "Fighting against market realities, bad luck that's actually poor planning, or missing opportunities because you're not paying attention to cycles. What trend are you resisting that you should be riding? What 'bad luck' is actually lack of preparation meeting circumstance?"
+        },
+        {
+            name: "Justice",
+            number: 11,
+            symbol: "⚖",
+            keywords: ["Fair exchange", "Contracts", "Integrity", "Consequences"],
+            upright: "Charge what you're worth. Deliver what you promise. The universe has perfect accounting—eventually, you receive in proportion to the value you create. Justice in business means clear contracts, fair pricing, transparent dealings. Your integrity is your brand. Protect it. The short-term gain from cutting corners costs more than it's worth.",
+            reversed: "Undercharging and resenting it, over-promising and under-delivering, or being taken advantage of because you won't enforce boundaries. Where's the imbalance in your exchanges? What needs to come into right relationship?"
+        },
+        {
+            name: "The Hanged Man",
+            number: 12,
+            symbol: "⍑",
+            keywords: ["Pause", "Perspective shift", "Investment period", "Waiting"],
+            upright: "Sometimes growth requires a pause. The Hanged Man is the period between investment and return—you've planted seeds and now you wait while they germinate. This might be time invested in learning, building, developing products that aren't generating income yet. Trust the lag time between effort and reward. The pause is productive even when it doesn't feel like it.",
+            reversed: "Stagnation disguised as strategy, unnecessary sacrifice, or refusing to pivot when the market has clearly spoken. Are you waiting for results from something that's not working? Or are you moving too fast, refusing to let things develop properly? Discernment needed."
+        },
+        {
+            name: "Death",
+            number: 13,
+            symbol: "⚰",
+            keywords: ["Business endings", "Pivots", "Letting go", "Transformation"],
+            upright: "The business model that got you here won't get you there. Something needs to end so something new can begin. Death in prosperity terms is the necessary closure—ending a partnership that's no longer serving, shutting down a product line, walking away from a client, pivoting your entire business. Grieve the loss and get excited about the space it creates.",
+            reversed: "Clinging to business models that are clearly dying, refusing to pivot, or killing things prematurely in a panic. What actually needs to end? And what just needs to evolve? Not everything requires complete destruction. Some things just need transformation."
+        },
+        {
+            name: "Temperance",
+            number: 14,
+            symbol: "⚗",
+            keywords: ["Balance", "Moderation", "Testing", "Refinement"],
+            upright: "Test, measure, adjust. Temperance is the alchemical process of business refinement—mixing different strategies until you find what works, balancing multiple income streams, maintaining equilibrium between work and life. Sustainable success requires moderation. You can't sprint forever. You can't scale infinitely. Find the right mixture for this stage.",
+            reversed: "Imbalance leading to burnout or business failure, extremism, or trying to do too many things without excellence in any. Where are you out of balance? What needs to come into right proportion?"
+        },
+        {
+            name: "The Devil",
+            number: 15,
+            symbol: "🜏",
+            keywords: ["Money addiction", "Toxic success", "Freedom", "Breaking free"],
+            upright: "Money is a tool, not a master. The Devil asks: have you become enslaved to the pursuit of wealth? Are you sacrificing health, relationships, integrity for financial gain? Or have you created a business that owns you rather than serving you? The chains are loose. You can walk away. You can restructure. Financial success that costs you your soul is not success.",
+            reversed: "Breaking free from toxic work, recognizing financial codependency, or seeing through the illusion that more money will fix everything. What are you ready to release? What pattern of relating to money and success is ready to shift?"
+        },
+        {
+            name: "The Tower",
+            number: 16,
+            symbol: "🗲",
+            keywords: ["Business crisis", "Market disruption", "Revelation", "Rebuild"],
+            upright: "The business model just collapsed. The market shifted. The partnership exploded. The Tower is the sudden, unavoidable destruction that reveals what was always unstable. Yes, it's devastating. Yes, it's an opportunity. What's being revealed now that you couldn't see before? The foundation that remains after the Tower is what you rebuild from. And what you build next will be more solid because it's built on truth.",
+            reversed: "Seeing the collapse coming and bracing, slow deterioration instead of sudden crisis, or avoiding the necessary destruction that would actually free you. Sometimes the Tower needs to fall. Stop trying to hold it together."
+        },
+        {
+            name: "The Star",
+            number: 17,
+            symbol: "✶",
+            keywords: ["Hope", "Vision", "Long-term planning", "Inspiration"],
+            upright: "After the Tower, the vision becomes clear. The Star is hope renewed, the long-term vision that guides your rebuilding. You can see where you're going now. The path isn't easy, but it's clear. This is the breath after surviving crisis—you're still here, and you know what you're building toward. Trust that vision. Let it guide your next steps.",
+            reversed: "Lost hope, can't see a path forward, or false hope that's not grounded in reality. Are you giving up too soon? Or clinging to a vision that's no longer viable? Sometimes the Star reversed means you need to adjust the vision to match current reality."
+        },
+        {
+            name: "The Moon",
+            number: 18,
+            symbol: "☾",
+            keywords: ["Uncertainty", "Intuition in business", "Unclear path", "Trust"],
+            upright: "Not all business decisions come with clear data. The Moon represents navigating when the path is unclear, trusting your instincts when the numbers don't tell the whole story, moving forward despite uncertainty. Your fear might be showing you something real, or it might be showing you old patterns. Trust your intuition, but verify what you can.",
+            reversed: "Paralysis from fear, deception in business dealings (self or other), or inability to see clearly through the illusions. What are you afraid is true? What do you need to illuminate to make a clear decision? Sometimes you need to turn on the lights before you can move forward."
+        },
+        {
+            name: "The Sun",
+            number: 19,
+            symbol: "☉",
+            keywords: ["Success", "Visibility", "Clear wins", "Joy in work"],
+            upright: "Everything is illuminated and everything is working. The Sun is clear, obvious success—the launch that works, the client that says yes, the profit that finally reflects your effort. This is success that feels good because it's aligned with your truth. Enjoy it. Share it. Let yourself be visible. You've earned this light.",
+            reversed: "Success that feels hollow, overexposure, or ego inflation. Are you performing success for the audience or actually experiencing it? Is the visibility serving your business or has it become the point? Sometimes the Sun reversed is just a temporary dimming—the work is still good even when the spotlight's not on it."
+        },
+        {
+            name: "Judgement",
+            number: 20,
+            symbol: "📯",
+            keywords: ["Calling", "Vocation", "Level up", "Reckoning"],
+            upright: "This is not just a job. This is your calling. Judgement represents the moment you recognize your true vocation—the work you're meant to do, the impact you're meant to have, the contribution that's uniquely yours to make. Are you answering that call? Or are you playing small because the bigness feels scary? You're being invited to step into your full professional power.",
+            reversed: "Ignoring your calling because it doesn't seem 'practical,' harsh self-judgment that keeps you small, or waiting for permission to do your real work. No one is coming to anoint you. You have to claim your vocation yourself. What are you waiting for?"
+        },
+        {
+            name: "The World",
+            number: 21,
+            symbol: "🜨",
+            keywords: ["Achievement", "Mastery", "Completion", "Global reach"],
+            upright: "You've reached a level of professional mastery and completion. The World represents achieving your business goals, reaching the income level you targeted, building the business you envisioned. This is not the end—it's the completion of one cycle and the beginning of another. Celebrate how far you've come. Acknowledge your mastery. And ask: what's next?",
+            reversed: "Incomplete projects, goals not quite reached, or refusing to acknowledge the success you've already achieved. Are you so focused on the next goal that you can't celebrate this one? Or is there one final piece of work needed before this cycle can close? Finish what you started, then move forward."
+        }
+    ],
+
+    wands: [
+        {
+            name: "Ace of Wands",
+            symbol: "🔥",
+            keywords: ["Business idea", "Opportunity", "Passion project", "Initiative"],
+            upright: "A brilliant business idea has arrived. The Ace of Wands is the spark of opportunity, the project that excites you, the direction that feels alive. This has real potential—but it's just potential. Ideas don't make money; execution does. This is your green light to begin. Take the first step.",
+            reversed: "False starts, ideas without follow-through, or passion without a viable business model. Are you in love with the idea but unwilling to do the work? Or have you had this idea for months without action? Start or release it—the in-between is draining your energy."
+        },
+        {
+            name: "Two of Wands",
+            symbol: "🌍",
+            keywords: ["Business planning", "Expansion", "Partnership", "Decision"],
+            upright: "You've had initial success and now you're planning the next phase. The Two of Wands is strategic planning, considering expansion, evaluating partnership opportunities. You're holding the world—bigger markets, new territories, scaled growth. Make the plan. Then commit to it.",
+            reversed: "Analysis paralysis, over-planning without action, or fear of expansion. You have enough information to make a decision. Waiting for perfect clarity is a stall tactic. Choose direction and adjust as you go."
+        },
+        {
+            name: "Three of Wands",
+            symbol: "⛵",
+            keywords: ["Expansion", "Investment returns", "Global reach", "Foresight"],
+            upright: "Your efforts are expanding beyond your immediate reach. The Three of Wands represents the moment when your business or career starts generating momentum, when the investments you made begin returning value. You're seeing the results of your foresight. Keep your eyes on the horizon—more is coming.",
+            reversed: "Overextension, poor planning for growth, or expansion that's happening too fast to sustain. Have you built the infrastructure to support this growth? Or are you scaling beyond your capacity to deliver quality? Grow strategically, not frantically."
+        },
+        {
+            name: "Four of Wands",
+            symbol: "🏛️",
+            keywords: ["Milestone", "Celebration", "Team success", "Foundation"],
+            upright: "Celebrate the milestone—you've built something real and stable. The Four of Wands is the successful launch, the first profitable quarter, the team assembled, the foundation laid. This is worth celebrating. Take time to acknowledge what you've created before rushing to the next goal. Celebration is not frivolous; it's fuel.",
+            reversed: "Unstable foundation disguised as success, inability to celebrate progress, or structure that's not as solid as it appears. Are you moving too fast to notice the cracks? Or so focused on what's not working that you can't appreciate what is?"
+        },
+        {
+            name: "Five of Wands",
+            symbol: "⚔️",
+            keywords: ["Competition", "Market challenges", "Hustle", "Differentiation"],
+            upright: "Competition is fierce, but you have what it takes. The Five of Wands is the crowded marketplace, the challenge of differentiation, the hustle required to stand out. This is not personal—everyone's fighting for market share. Your job is to be so clear on your unique value that you're not competing, you're creating your own category.",
+            reversed: "Avoiding competition by hiding, destructive conflict, or competing in a race not worth running. Are you fighting battles that don't serve your business? Or avoiding the arena entirely because competition feels uncomfortable? Strategic competition sharpens you."
+        },
+        {
+            name: "Six of Wands",
+            symbol: "🏆",
+            keywords: ["Public success", "Recognition", "Market leadership", "Victory"],
+            upright: "Public recognition for your work—you've won, and people are noticing. The Six of Wands is the award, the feature, the viral moment, the industry recognition. Your success is visible and validated. This is earned, not luck. Receive the recognition with grace, and use the visibility to serve your mission.",
+            reversed: "Success without recognition, excessive need for external validation, or recognition that feels hollow. Are you chasing applause instead of impact? Or doing brilliant work that no one knows about because you refuse to market yourself? Both need adjustment."
+        },
+        {
+            name: "Seven of Wands",
+            symbol: "🛡️",
+            keywords: ["Market position", "Competition", "Standing firm", "Defense"],
+            upright: "You've claimed your market position and now you're defending it. The Seven of Wands represents protecting what you've built—your pricing, your boundaries, your unique approach. Others are challenging your position or copying your work. Stand firm. You earned this ground. Defend it with confidence.",
+            reversed: "Fighting battles not worth fighting, defending a position that's no longer tenable, or giving up when you should stand firm. Which battles actually matter? Where should you hold ground, and where should you pivot?"
+        },
+        {
+            name: "Eight of Wands",
+            symbol: "➶",
+            keywords: ["Rapid growth", "Momentum", "Quick deals", "Communication"],
+            upright: "Everything is happening fast—deals closing, opportunities arriving, rapid growth. The Eight of Wands is the whoosh of momentum when all your efforts align. This is exciting and potentially overwhelming. Stay focused. Keep your systems tight. Ride the energy without getting scattered.",
+            reversed: "Delays, miscommunication, or growth so fast it's unsustainable. Are you rushing when you should be building capacity? Or have things slowed down and you're frustrated with the pace? Sometimes fast is good; sometimes strategic patience is better."
+        },
+        {
+            name: "Nine of Wands",
+            symbol: "🔥",
+            keywords: ["Resilience", "Persistence", "Almost there", "Final push"],
+            upright: "You're tired, you've been at this for a while, and you're almost there. The Nine of Wands is the final push before breakthrough, the resilience that separates successful businesses from failed attempts. You're closer than you think. Don't quit now. Protect what you've built and push through to completion.",
+            reversed: "Burnout, paranoid defensiveness, or giving up right before the breakthrough. Are you so defended that you can't receive help? Or so exhausted you're about to quit when you're 90% there? Rest if needed, but don't give up."
+        },
+        {
+            name: "Ten of Wands",
+            symbol: "⚒️",
+            keywords: ["Overwork", "Burden of success", "Delegation", "Responsibility"],
+            upright: "Success has brought responsibility—maybe too much. The Ten of Wands represents being overloaded with work, carrying the entire business yourself, the burden of growth. You cannot sustain this. Delegate. Hire. Release what's not yours to carry. This level of success requires a team, not a solo effort.",
+            reversed: "Collapse under responsibility, refusing to delegate, or the recognition that you've taken on burdens not yours to carry. What can you put down? Who can you bring in? Where have you said yes when you should have said no?"
+        },
+        {
+            name: "Page of Wands",
+            symbol: "🌱",
+            keywords: ["New opportunity", "Exploration", "News", "Learning"],
+            upright: "A new business opportunity, a message about work, or the energy of exploration and experimentation. The Page of Wands brings news of possibilities—a potential client, a new market, an idea worth exploring. Don't commit fully yet, but do investigate. This might be the beginning of something significant.",
+            reversed: "Scattered focus, chasing shiny objects, or hesitation when you should be exploring. Are you so busy looking at options that you never choose one? Or so afraid of making the wrong choice that you stay stuck? Explore, test, then commit."
+        },
+        {
+            name: "Knight of Wands",
+            symbol: "🐎",
+            keywords: ["Bold action", "Risk-taking", "Travel", "Passion"],
+            upright: "All action, all energy, charging forward with total commitment. The Knight of Wands is the entrepreneur who risks everything on their vision, the bold career move, the all-in commitment. This energy creates breakthroughs, but also burnout. Channel the passion, but pace yourself. You're running a marathon disguised as a sprint.",
+            reversed: "Reckless business moves, burnout, or all passion with no strategy. Are you moving fast because you have clarity, or because you're afraid to slow down and think? Bold action is powerful when it's strategic, dangerous when it's reactive."
+        },
+        {
+            name: "Queen of Wands",
+            symbol: "👑",
+            keywords: ["Leadership", "Charisma", "Entrepreneurship", "Confidence"],
+            upright: "The Queen of Wands is the confident leader, the magnetic entrepreneur, the one who attracts opportunities through sheer presence. You know your worth and you're not afraid to claim it. This is powerful personal brand energy—people want to work with you because of who you are, not just what you do. Own it.",
+            reversed: "Insecurity masquerading as confidence, jealousy of others' success, or dimming your light to make others comfortable. Are you performing confidence without believing it? Or has ego overtaken substance? Return to genuine self-assurance rooted in real skill."
+        },
+        {
+            name: "King of Wands",
+            symbol: "⚡",
+            keywords: ["Visionary leadership", "Business mastery", "Influence", "Success"],
+            upright: "The King of Wands is the successful CEO, the visionary leader, the entrepreneur who's built something significant. You have the vision, the skill, and the leadership capacity to create at scale. This is mastered creative power in service of tangible goals. Lead with clarity. Inspire with vision. Execute with excellence.",
+            reversed: "Ego-driven leadership, tyrannical control, or vision without execution. Are you all talk and no delivery? Or are you wielding your success as a weapon? True leadership serves something larger than ego."
+        }
+    ],
+
+    cups: [
+        {
+            name: "Ace of Cups",
+            symbol: "💧",
+            keywords: ["New client relationship", "Emotional fulfillment", "Creative project", "Flow"],
+            upright: "A new business relationship or project that feels emotionally fulfilling. The Ace of Cups in prosperity terms is work that feeds your soul while paying your bills—the client who's a joy to work with, the project that's both profitable and meaningful. This is the beginning of work that feels like flow. Say yes.",
+            reversed: "Emotional burnout, work that pays but depletes you, or opportunity that looks good but feels wrong. Trust your emotional response to business opportunities. If it feels off, there's probably a reason. Not all money is worth the soul cost."
+        },
+        {
+            name: "Two of Cups",
+            symbol: "💞",
+            keywords: ["Partnership", "Collaboration", "Win-win", "Alliance"],
+            upright: "A mutually beneficial partnership is forming. The Two of Cups represents business relationships built on respect, aligned values, and mutual benefit. This is the ideal client, the perfect collaborator, the partner who sees you and you see them. These relationships create value beyond what either could generate alone.",
+            reversed: "Imbalanced partnerships, codependent business relationships, or collaborations built on misaligned values. Are you giving 80% and receiving 20%? Or are you trying to force partnership where there's fundamental incompatibility? Healthy business relationships require balance."
+        },
+        {
+            name: "Three of Cups",
+            symbol: "🎉",
+            keywords: ["Team celebration", "Networking", "Community", "Collaboration"],
+            upright: "Your business community is celebrating with you—successful team collaboration, networking that leads to opportunities, the abundance that comes from community. The Three of Cups reminds you that business success is sweeter when shared. Celebrate wins with your team. Invest in relationships. Your network is your net worth.",
+            reversed: "Superficial networking, toxic team dynamics, or isolation from your business community. Are you surrounding yourself with people who genuinely support your success? Or are these connections transactional and empty? Quality matters more than quantity."
+        },
+        {
+            name: "Four of Cups",
+            symbol: "🌳",
+            keywords: ["Reevaluation", "Boredom", "Missed opportunities", "Contemplation"],
+            upright: "You're feeling bored or dissatisfied with current opportunities, but are you missing something good right in front of you? The Four of Cups is the danger of taking success for granted, or the wisdom to pause and reevaluate before accepting new offers. Are you actually dissatisfied, or just restless? Sometimes contemplation is needed before the next move.",
+            reversed: "New awareness, readiness to engage, or recognizing that you've been ignoring good opportunities. What are you finally ready to see? What opportunity have you been dismissing that actually deserves attention?"
+        },
+        {
+            name: "Five of Cups",
+            symbol: "😢",
+            keywords: ["Business loss", "Disappointment", "Failed venture", "Recovery"],
+            upright: "A business setback or loss—three cups spilled, but two remain standing. The Five of Cups is the necessary grief after failure, the disappointment when things don't work out. Honor the loss and learn from it. But don't miss this: you still have resources. You can rebuild. Turn around and see what remains.",
+            reversed: "Stuck in grief over past business failures, unable to move forward, or bypassing necessary processing of loss. Are you letting one failure define you? Or are you pretending it didn't hurt when it did? Both prevent you from rebuilding wisely."
+        },
+        {
+            name: "Six of Cups",
+            symbol: "🌼",
+            keywords: ["Past clients", "Referrals", "Nostalgia", "Simple pleasures"],
+            upright: "Past clients returning, referrals from old connections, or remembering why you started this work in the first place. The Six of Cups in business is the value of your history—satisfied clients refer others, previous work creates current opportunities. Sometimes the simplest, most familiar approach is the most profitable. Don't overcomplicate.",
+            reversed: "Living in past success instead of current reality, trying to recreate what worked before instead of adapting to now, or unresolved issues with past clients affecting current work. The market has changed. Adapt or become irrelevant."
+        },
+        {
+            name: "Seven of Cups",
+            symbol: "☁️",
+            keywords: ["Too many options", "Unclear direction", "Illusion", "Choice"],
+            upright: "Too many opportunities and you're not sure which to choose. The Seven of Cups is the overwhelm of options—different income streams, various business ideas, multiple offers. Not all are viable. Some are illusions. Get clear on your actual goals, then choose the path most aligned with them. Focus creates results.",
+            reversed: "Clarity emerging from confusion, or being so lost in possibility that you take no action at all. The reversed Seven can mean you're finally choosing, or that you're so scattered nothing's working. Which is it? Make a decision and commit."
+        },
+        {
+            name: "Eight of Cups",
+            symbol: "🚶",
+            keywords: ["Walking away", "Career change", "Quest for meaning", "Transition"],
+            upright: "You're walking away from a job, client, or business model that no longer serves your growth—even though it's not 'wrong.' The Eight of Cups is the courage to leave security in search of meaningful work, to walk away from good money when it costs your soul. Your deeper calling is pulling you forward. Trust it.",
+            reversed: "Fear of leaving comfort even when you're clearly done, or wandering without direction. Are you staying because it serves you, or because leaving feels scary? Sometimes the reversed Eight means you've been walking so long you've forgotten why you left. Check in with your truth."
+        },
+        {
+            name: "Nine of Cups",
+            symbol: "🍷",
+            keywords: ["Wish fulfilled", "Financial satisfaction", "Success", "Contentment"],
+            upright: "The 'wish card' for prosperity—financial goals met, satisfying work, the sense of having enough and being enough. The Nine of Cups is permission to feel satisfied, to enjoy your success without guilt, to want what you want and have it. You're allowed to feel good about your financial reality.",
+            reversed: "Greed, dissatisfaction despite having plenty, or success that feels hollow. Are you always chasing more without enjoying what you have? Or is the success you've achieved not what you actually wanted? True prosperity includes satisfaction, not just accumulation."
+        },
+        {
+            name: "Ten of Cups",
+            symbol: "🌈",
+            keywords: ["Work-life harmony", "Sustainable success", "Fulfillment", "Legacy"],
+            upright: "Work that supports the life you want—family time, financial security, emotional fulfillment, and meaningful contribution all in harmony. The Ten of Cups represents sustainable success that feeds all aspects of your life, not just your bank account. This is prosperity in its fullest sense. Wholeness achieved.",
+            reversed: "Success at the cost of relationships, work consuming everything, or the picture-perfect business hiding dysfunction. What's the gap between how things look and how they feel? True prosperity includes quality of life, not just quantity of money."
+        },
+        {
+            name: "Page of Cups",
+            symbol: "🐠",
+            keywords: ["Creative opportunity", "Intuitive message", "New client", "Proposal"],
+            upright: "A creative business opportunity, intuitive hit about a new direction, or message about work that touches your heart. The Page of Cups brings news of emotionally meaningful opportunities. This might not be the biggest money, but it could be the most fulfilling. Worth exploring.",
+            reversed: "Ignoring intuition about business, emotionally immature approach to work, or being so idealistic about opportunities that you miss red flags. Ground your creative ideas in reality. Feel into opportunities, but verify the details."
+        },
+        {
+            name: "Knight of Cups",
+            symbol: "🏇",
+            keywords: ["Proposal", "Creative pursuit", "Following passion", "Idealism"],
+            upright: "A business proposal, an invitation to pursue creative work, or the part of you that wants to follow passion over practicality. The Knight of Cups is the romantic approach to career—following your heart, pursuing your dream, betting on your vision. Beautiful and necessary, but ground it in reality. Can you pay bills while you pursue the dream?",
+            reversed: "Unrealistic expectations about creative work, all promise and no delivery, or moodiness affecting your professionalism. Are you romanticizing the work without understanding the reality? Or are you so idealistic about what's possible that you're not doing the practical work to make it happen?"
+        },
+        {
+            name: "Queen of Cups",
+            symbol: "🔮",
+            keywords: ["Intuitive business", "Emotional intelligence", "Client care", "Empathy"],
+            upright: "The Queen of Cups is emotional intelligence in business—reading clients, understanding unspoken needs, creating experiences that touch people. This is powerful in service industries, coaching, healing work, anything involving deep human connection. Your empathy is your competitive advantage. Use it wisely without depleting yourself.",
+            reversed: "Emotional overwhelm in work, poor boundaries with clients, or using emotional manipulation in business. Are you absorbing clients' problems instead of holding space for them? Your compassion is a gift, but you can't help anyone if you're drowning in their emotions. Boundaries are essential."
+        },
+        {
+            name: "King of Cups",
+            symbol: "🌊",
+            keywords: ["Emotional maturity", "Balanced leadership", "Client relationships", "Wisdom"],
+            upright: "The King of Cups leads with emotional wisdom—present, compassionate, but not swept away. In business, this is the leader who understands people, creates psychologically safe environments, manages relationships with maturity. You can feel deeply about your work while maintaining professional boundaries. This is mastery of emotional business intelligence.",
+            reversed: "Emotional manipulation in business, volatility, or complete emotional shutdown in professional settings. Are you using emotions to control? Or have you shut down feeling entirely to appear 'professional'? Neither works. True leadership integrates emotion with wisdom."
+        }
+    ],
+
+    swords: [
+        {
+            name: "Ace of Swords",
+            symbol: "⚔️",
+            keywords: ["Clarity", "Breakthrough idea", "Truth", "Decision"],
+            upright: "A moment of perfect clarity about your business or career. The Ace of Swords is the breakthrough idea, the clear decision, the cutting away of confusion to reveal the obvious path forward. You see it now. The truth is clear. Act on this clarity while you have it.",
+            reversed: "Confusion, mental fog, or using truth as a weapon. The sword cuts both ways—are you using your clarity to liberate or to wound? Sometimes the reversed Ace means you're not ready to speak the truth you see. Wait for right timing, but don't wait forever."
+        },
+        {
+            name: "Two of Swords",
+            symbol: "⚖️",
+            keywords: ["Difficult decision", "Stalemate", "Avoidance", "Impasse"],
+            upright: "You're at an impasse, avoiding a difficult business decision because both options feel painful. The Two of Swords is the moment before choice—you can't stay here forever. Eventually you'll have to remove the blindfold and choose. Neither option is perfect; both have consequences. Choose anyway.",
+            reversed: "Finally making the decision, or being so stuck that paralysis has become the default. What are you avoiding seeing? What truth about this situation are you not willing to face? Make the choice or it will be made for you."
+        },
+        {
+            name: "Three of Swords",
+            symbol: "💔",
+            keywords: ["Business heartbreak", "Painful truth", "Betrayal", "Loss"],
+            upright: "Painful truth in business—betrayal by a partner, a project that failed, the recognition that you need to let someone go. The Three of Swords hurts, but it's the pain that comes from finally seeing reality clearly. This truth, however painful, frees you to make different choices. Feel it. Learn from it. Move forward wiser.",
+            reversed: "Healing from business betrayal, or refusing to face painful truths. Are you recovering from a professional heartbreak? Or still in denial about something you know is true? Both are stages. Which are you in?"
+        },
+        {
+            name: "Four of Swords",
+            symbol: "🛌",
+            keywords: ["Strategic pause", "Rest", "Recovery", "Planning"],
+            upright: "Strategic retreat from the business battlefield. The Four of Swords is the sabbatical, the planned pause, the recovery period after intense work. This is not laziness—it's strategic rest that prevents burnout and creates space for new clarity. Take the break. You'll return sharper.",
+            reversed: "Burnout from refusing to rest, or resting so long it's become stagnation. Are you driving yourself to exhaustion? Or have you been 'taking a break' for six months? Both are imbalanced. Find the right rhythm between work and rest."
+        },
+        {
+            name: "Five of Swords",
+            symbol: "⚔️",
+            keywords: ["Win at all costs", "Hollow victory", "Unethical behavior", "Conflict"],
+            upright: "You won the battle but damaged relationships in the process. The Five of Swords asks: was being right worth the cost? In business, this might be undercutting competition unethically, winning a contract through manipulation, or protecting your position so aggressively you've isolated yourself. Some victories aren't worth it.",
+            reversed: "Making peace, recognizing the cost of your approach, or refusing to engage in destructive business practices. Can you compete without destroying? Can you succeed without sacrificing integrity? The answer is yes—but it requires different tactics."
+        },
+        {
+            name: "Six of Swords",
+            symbol: "⛵",
+            keywords: ["Transition", "Moving on", "Recovery", "Mental shift"],
+            upright: "Transitioning from turbulent business period to calmer waters. The Six of Swords is leaving a toxic work environment, moving past a failed venture, changing industries. You're moving toward something better, even if you can't quite see the shore yet. Trust that this transition is necessary and leading somewhere good.",
+            reversed: "Resistance to necessary career transition, or rushing forward without processing what happened. Are you trying to skip the healing? Or refusing to leave what's clearly over? Honor the transition. Don't bypass it."
+        },
+        {
+            name: "Seven of Swords",
+            symbol: "🏃",
+            keywords: ["Strategy", "Working smart", "Secrets", "Shortcuts"],
+            upright: "Strategic thinking, working smart instead of hard, or possibly cutting corners. The Seven of Swords in business can be legitimate strategy—finding the efficient path, protecting your intellectual property, keeping plans quiet until execution. Or it can be deception, theft of ideas, unethical shortcuts. Know which you're doing.",
+            reversed: "Coming clean, getting caught, or recognizing that your 'strategy' crossed into dishonesty. What truth have you been avoiding? Where have you cut corners that will eventually cost you? Integrity in the long run beats clever shortcuts."
+        },
+        {
+            name: "Eight of Swords",
+            symbol: "🔒",
+            keywords: ["Limiting beliefs", "Trapped", "Victimhood", "Self-imposed limits"],
+            upright: "You feel trapped in your career or business, but the bonds are largely mental. The Eight of Swords represents limiting beliefs about money, success, what's possible for you. 'I can't charge that much.' 'I'm not qualified.' 'This market is saturated.' These stories feel true, but they're keeping you small. Remove the blindfold. Walk out of the cage of your own making.",
+            reversed: "Breaking free from limiting beliefs, or being so trapped you can't see the way out. Which is this? If you're breaking free, celebrate and keep going. If you're trapped, ask for help. Sometimes we can't see our own prison until someone else points to the door."
+        },
+        {
+            name: "Nine of Swords",
+            symbol: "😰",
+            keywords: ["Financial anxiety", "Worry", "Stress", "Insomnia"],
+            upright: "3am panic about money, business, career. The Nine of Swords is mental anguish about your financial reality—worried you won't make it, replaying failures, catastrophizing the future. Some of this worry is useful information; most is mental torture without purpose. Separate real problems from anxiety. Address what's real. Release the stories.",
+            reversed: "Recovery from financial anxiety, or anxiety so deep you're not functioning. The worst might be over, or you might need professional support. Be honest about which this is. There's no shame in asking for help with mental health around money."
+        },
+        {
+            name: "Ten of Swords",
+            symbol: "⚰️",
+            keywords: ["Business failure", "Rock bottom", "Ending", "Betrayal"],
+            upright: "Total business failure, devastating betrayal, or career rock bottom. The Ten of Swords is as bad as it gets—but that means it can't get worse. This is the definitive ending. And endings create space for beginnings. You've hit bottom. The only way out is up. Leave the swords behind and walk toward the sunrise.",
+            reversed: "Recovery from disaster, or refusing to accept that it's over. Are you resurrecting something that should stay dead? Or are you finally getting up and moving forward? The swords can't be removed one at a time—you have to leave them all behind and rebuild."
+        },
+        {
+            name: "Page of Swords",
+            symbol: "🗡️",
+            keywords: ["Research", "New information", "Curiosity", "Communication"],
+            upright: "New information, market research, or the energy of curious investigation. The Page of Swords is learning about your market, gathering competitive intelligence, asking good questions. This is intellectual hunger in service of business. Stay curious, but develop discernment about what information actually matters.",
+            reversed: "Overthinking, gossip, or using intelligence to avoid action. Are you researching endlessly to avoid launching? Or spreading rumors instead of building your business? Think less. Do more."
+        },
+        {
+            name: "Knight of Swords",
+            symbol: "🐎",
+            keywords: ["Aggressive action", "Ambition", "Speed", "Directness"],
+            upright: "Moving fast with total clarity and focus. The Knight of Swords is aggressive business action—launching hard, going after what you want with no apology, cutting through obstacles with decisive action. This creates breakthroughs, but can also burn bridges. Are you being strategic or just aggressive? Direct or cruel?",
+            reversed: "Reckless business moves, offensive communication, or total paralysis. Are you charging forward without thinking? Or so afraid of being aggressive that you're completely passive? Neither serves you. Find the balance between bold action and strategic thought."
+        },
+        {
+            name: "Queen of Swords",
+            symbol: "👑",
+            keywords: ["Clear communication", "Boundaries", "Independence", "Standards"],
+            upright: "The Queen of Swords is crystal clear communication, firm boundaries, and high professional standards. She says what she means, charges what she's worth, and doesn't apologize for her clarity. This is you when you stop trying to make everyone comfortable and start speaking your truth. Your directness is your power. Use it.",
+            reversed: "Bitterness, cruelty disguised as honesty, or boundaries so rigid nothing can reach you. Can you be clear without being cold? Can you maintain standards without becoming impossible to work with? True mastery is directness with compassion."
+        },
+        {
+            name: "King of Swords",
+            symbol: "⚖️",
+            keywords: ["Strategic thinking", "Authority", "Ethics", "Logic"],
+            upright: "The King of Swords is strategic leadership—decisions based on clear thinking, ethical standards maintained even when costly, authority that serves truth rather than ego. This is the CFO, the consultant, the advisor who sees clearly and speaks honestly. Your clarity is valuable. Your strategic thinking solves problems. Price accordingly.",
+            reversed: "Tyrannical leadership, manipulation, or logic without compassion. Are you using your intelligence as a weapon? Enforcing rules without wisdom? True authority serves something larger than itself. Lead with both head and heart."
+        }
+    ],
+
+    pentacles: [
+        {
+            name: "Ace of Pentacles",
+            symbol: "💰",
+            keywords: ["New income", "Opportunity", "Manifestation", "Investment"],
+            upright: "A tangible new opportunity for income—new client, job offer, business idea with real potential. The Ace of Pentacles is the universe's 'yes' in material form. This is real, not just potential. The foundation is solid. The opportunity is viable. Take it and run.",
+            reversed: "Missed opportunity, financial insecurity, or offers that look good but lack substance. Are you letting fear keep you from acting on real opportunity? Or are you chasing something that's not as solid as it appears? Discernment needed."
+        },
+        {
+            name: "Two of Pentacles",
+            symbol: "∞",
+            keywords: ["Multiple income streams", "Balance", "Adaptability", "Juggling"],
+            upright: "Balancing multiple projects, income streams, or financial priorities. The Two of Pentacles is the freelancer juggling clients, the entrepreneur managing various revenue sources, the employee with a side hustle. You're keeping all the balls in the air with grace and flexibility. Stay present. Keep dancing.",
+            reversed: "Overwhelm, financial imbalance, or trying to do too much. Are you dropping balls? Spreading yourself so thin that nothing gets your full attention? What needs to be released so you can focus on what actually generates the most value?",
+        },
+        {
+            name: "Three of Pentacles",
+            symbol: "🏗️",
+            keywords: ["Skilled work", "Collaboration", "Mastery", "Recognition"],
+            upright: "Your skills are being recognized and compensated appropriately. The Three of Pentacles is mastery acknowledged, collaboration that creates value, the understanding that true wealth is built through teamwork and skill development. Your expertise matters. Contribute it. You'll be rewarded.",
+            reversed: "Skills not recognized or compensated fairly, poor collaboration, or refusing to develop the expertise needed. Are you undervaluing your skills? Or expecting to be paid for expertise you haven't developed? Bridge the gap."
+        },
+        {
+            name: "Four of Pentacles",
+            symbol: "🔒",
+            keywords: ["Saving", "Security", "Control", "Scarcity"],
+            upright: "Building savings, creating financial security, or possibly holding too tightly. The Four of Pentacles can be wise financial management—saving for goals, protecting your resources. Or it can be scarcity thinking that prevents generosity and opportunity. Are you being prudent or fearful? There's a difference.",
+            reversed: "Release of scarcity thinking, or loss of financial control. This could be generous opening to flow, or reckless spending. Which is it? Find the balance between saving and spending, between protection and flow."
+        },
+        {
+            name: "Five of Pentacles",
+            symbol: "❄️",
+            keywords: ["Financial hardship", "Struggle", "Support available", "Asking for help"],
+            upright: "Financial difficulty, but help is available if you'll ask for it. The Five of Pentacles is the struggle period—low income, unexpected expenses, feeling left out in the cold financially. But notice: there's a lighted window right there. Support exists. Resources are available. Will you ask? Or is pride keeping you in the cold?",
+            reversed: "Recovery from financial hardship, or refusing available help. The worst might be over, resources might be flowing again. Or you're suffering needlessly because you won't accept assistance. Which is it?"
+        },
+        {
+            name: "Six of Pentacles",
+            symbol: "⚖️",
+            keywords: ["Fair exchange", "Generosity", "Giving and receiving", "Balance"],
+            upright: "Balanced exchange of resources—fair pay for fair work, generosity that flows both ways, giving and receiving in healthy proportion. The Six of Pentacles is the ideal client relationship, the fair employer, the balanced exchange. Are you the giver or receiver right now? Both roles are necessary and honorable.",
+            reversed: "Imbalanced exchange, strings attached to money, or refusing to receive. Are you undercharging and over-delivering? Or taking advantage of others' generosity? Money with strings attached isn't truly given. Find authentic balance."
+        },
+        {
+            name: "Seven of Pentacles",
+            symbol: "🌾",
+            keywords: ["Assessment", "Patience", "Long-term investment", "ROI"],
+            upright: "Pausing to assess whether your efforts are generating adequate return. The Seven of Pentacles is the mid-point evaluation—is this working? Should I continue this strategy or pivot? You've invested time and energy; is it bearing fruit? Be honest. Then decide: persist, pivot, or abandon. All three are valid depending on what you see.",
+            reversed: "Impatience with results, abandoning projects too soon, or stubbornly continuing what's clearly not working. Are you expecting overnight success from work that requires years? Or watering dead soil because you're unwilling to admit failure? Honest assessment required."
+        },
+        {
+            name: "Eight of Pentacles",
+            symbol: "⚒️",
+            keywords: ["Skill development", "Craftsmanship", "Dedication", "Mastery"],
+            upright: "Dedication to craft, skill development, the patient work of mastery. The Eight of Pentacles is showing up every day to refine your skills, understanding that excellence creates its own market. This is the 10,000 hours, the deliberate practice, the commitment to being so good they can't ignore you. Keep working. Mastery pays.",
+            reversed: "Perfectionism preventing launch, meaningless work, or lack of focus on skill development. Are you working hard at something that doesn't feed your soul or your bank account? Or are you so focused on perfection you never ship? Excellence matters, but so does completion."
+        },
+        {
+            name: "Nine of Pentacles",
+            symbol: "🦜",
+            keywords: ["Financial independence", "Self-sufficiency", "Luxury", "Achievement"],
+            upright: "Financial independence achieved through your own efforts. The Nine of Pentacles is the freelancer who's fully booked, the entrepreneur who's profitable, the professional earning excellent income. You did this yourself. You built this security. Enjoy it without guilt. Self-sufficiency is something to celebrate.",
+            reversed: "Dependence, overwork without pleasure, or wealth that feels empty. Are you financially successful but unable to enjoy it? Or working so hard for independence that you've isolated yourself? What's the point of abundance if you can't receive it?"
+        },
+        {
+            name: "Ten of Pentacles",
+            symbol: "🏰",
+            keywords: ["Legacy", "Generational wealth", "Long-term security", "Family"],
+            upright: "Building wealth that lasts, creating systems that generate ongoing value, or receiving inheritance/family support. The Ten of Pentacles is thinking in generations, not quarters. What are you building that will outlast you? How are you creating security not just for yourself but for those who come after? This is wealth in its fullest expression.",
+            reversed: "Financial family conflict, inheritance issues, or recognizing that material wealth without emotional connection is empty. What's the foundation really built on? Is it solid or is there hidden dysfunction beneath the appearance of prosperity?"
+        },
+        {
+            name: "Page of Pentacles",
+            symbol: "📚",
+            keywords: ["New venture", "Learning", "Diligence", "Opportunity"],
+            upright: "Beginning of a new business venture, learning practical skills, or opportunity that requires diligent work. The Page of Pentacles is the student of prosperity—willing to start at the beginning, eager to learn, focused on building something real. Start small. Learn as you go. Results will come through consistent effort.",
+            reversed: "Procrastination, lack of follow-through, or learning without application. Are you endlessly planning without launching? Studying without doing? At some point you have to put theory into practice. Is that point now?"
+        },
+        {
+            name: "Knight of Pentacles",
+            symbol: "🐎",
+            keywords: ["Diligence", "Reliability", "Slow growth", "Consistency"],
+            upright: "Steady, consistent, reliable effort building toward financial goals. The Knight of Pentacles is the person who shows up every day, does the work without drama, and achieves success through sheer persistence. This is not flashy, but it's effective. Trust the slow build. Consistency compounds.",
+            reversed: "Stagnation, stubbornness, or perfectionism preventing progress. Are you being patient or stuck? Diligent or obsessive? Sometimes this Knight needs to speed up, take risks, or try new approaches. Is this one of those times?"
+        },
+        {
+            name: "Queen of Pentacles",
+            symbol: "👑",
+            keywords: ["Prosperity", "Resourcefulness", "Nurturing wealth", "Abundance"],
+            upright: "The Queen of Pentacles is abundance embodied—successful business owner, skilled professional, someone who knows how to create and maintain prosperity while remaining generous. She's grounded, practical, and knows her worth. This is you when you stop apologizing for your success and simply embody it. Nurture your wealth. Enjoy it. Share it. All three.",
+            reversed: "Self-neglect, overgiving, or disconnection from your own prosperity. Are you so busy taking care of others that your own finances suffer? Or so focused on making money that you've lost connection to why? Prosperity without presence is poverty."
+        },
+        {
+            name: "King of Pentacles",
+            symbol: "💎",
+            keywords: ["Wealth", "Business success", "Security", "Abundance"],
+            upright: "The King of Pentacles is wealth mastered—the successful entrepreneur, the executive, the investor, the person who's built lasting financial security. You understand money, you know how to create it, and you use it wisely to create more abundance. This is prosperity in service of life, wealth as a tool for creation. Lead with your mastery.",
+            reversed: "Greed, materialism, or using wealth to control. Are you equating net worth with self-worth? Using money to manipulate? Or so focused on accumulation that you've lost connection to values? Money is a tool, not an identity. Remember what it's for."
+        }
+    ]
+};
+
+// ============================================================================
+// PART 3: SPREAD CONFIGURATIONS & INTERACTIVE FUNCTIONALITY
+// ============================================================================
+
+const spreads = {
+    shadow: {
+        name: "Shadow Integration",
+        subtitle: "What's hidden, what it protects, how to integrate",
+        positions: [
+            { label: "What lies hidden in shadow" },
+            { label: "What this shadow protects" },
+            { label: "Path to integration" }
+        ]
+    },
+    sovereignty: {
+        name: "Sovereignty Reclamation",
+        subtitle: "Release the old, claim the truth, take action",
+        positions: [
+            { label: "Old pattern ready to release" },
+            { label: "The truth beneath it" },
+            { label: "Action step toward freedom" }
+        ]
+    },
+    business: {
+        name: "Authentic Launch",
+        subtitle: "Face the fear, offer the gift, take the step",
+        positions: [
+            { label: "Fear to face" },
+            { label: "Gift to offer" },
+            { label: "First sacred step" }
+        ]
+    },
+    expansion: {
+        name: "Expansion Check",
+        subtitle: "Trust your body's wisdom",
+        positions: [
+            { label: "Is this expansion or contraction?" }
+        ]
+    },
+    ancestral: {
+        name: "Ancestral Pattern",
+        subtitle: "What was inherited, what you're transforming, what you're liberating",
+        positions: [
+            { label: "What was inherited" },
+            { label: "What you're transforming" },
+            { label: "What you're liberating" }
+        ]
+    },
+    dissolution: {
+        name: "Dissolution & Emergence",
+        subtitle: "Navigate the sacred transition",
+        positions: [
+            { label: "What's dissolving" },
+            { label: "What's emerging" },
+            { label: "The void between" },
+            { label: "How to navigate" }
+        ]
+    },
+    single: {
+        name: "Single Card",
+        subtitle: "A message for right now",
+        positions: [
+            { label: "Your message" }
+        ]
+    },
+    dual: {
+        name: "Dual Wisdom",
+        subtitle: "Spirit and practical guidance",
+        positions: [
+            { label: "Spiritual wisdom (Jungian)", deck: "spiritual" },
+            { label: "Practical guidance (Prosperity)", deck: "prosperity" }
+        ]
+    }
+};
+
+// State management
+let currentSpread = null;
+let currentDeck = 'spiritual';
+let drawnCards = [];
+let revealedCount = 0;
+
+// Navigation
+function showScreen(screenName) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.getElementById(screenName).classList.add('active');
+    document.querySelector(`[data-screen="${screenName}"]`).classList.add('active');
+}
+
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => showScreen(link.dataset.screen));
+});
+
+function selectDeckAndGo(deck) {
+    currentDeck = deck;
+    updateDeckButtons();
+    // Scroll to spreads section
+    document.querySelector('.spreads-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Add visual feedback
+    document.querySelectorAll('.deck-card').forEach(card => card.style.opacity = '0.5');
+    event.target.closest('.deck-card').style.opacity = '1';
+}
+
+function setActiveDeck(deck) {
+    currentDeck = deck;
+    updateDeckButtons();
+}
+
+function updateDeckButtons() {
+    document.querySelectorAll('.deck-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.deck === currentDeck) {
+            btn.classList.add('active', currentDeck);
+        }
+    });
+}
+
+// Card utilities
+function getAllCards(deck) {
+    const deckData = deck === 'spiritual' ? jungianDeck : prosperityDeck;
+    const all = [
+        ...deckData.majorArcana,
+        ...deckData.wands,
+        ...deckData.cups,
+        ...deckData.swords,
+        ...deckData.pentacles
+    ];
+    return all;
+}
+
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+function drawCards(count, deck = currentDeck) {
+    const allCards = getAllCards(deck);
+    const shuffled = shuffleArray(allCards);
+    return shuffled.slice(0, count).map(card => ({
+        ...card,
+        isReversed: Math.random() < 0.3, // 30% chance of reversed
+        deck: deck
+    }));
+}
+
+// Spread setup
+function startReading(spreadKey) {
+    currentSpread = spreadKey;
+    const spread = spreads[spreadKey];
+    drawnCards = [];
+    revealedCount = 0;
+
+    // Special handling for dual spread
+    if (spreadKey === 'dual') {
+        const spiritualCard = drawCards(1, 'spiritual')[0];
+        const prosperityCard = drawCards(1, 'prosperity')[0];
+        drawnCards = [spiritualCard, prosperityCard];
+    } else {
+        drawnCards = drawCards(spread.positions.length, currentDeck);
+    }
+
+    // Update UI
+    document.getElementById('spread-title').textContent = spread.name;
+    document.getElementById('spread-subtitle').textContent = spread.subtitle;
+
+    // Hide deck selector for dual spread
+    const deckSelector = document.querySelector('.deck-selector');
+    if (spreadKey === 'dual') {
+        deckSelector.style.display = 'none';
+    } else {
+        deckSelector.style.display = 'flex';
+        updateDeckButtons();
+    }
+
+    // Render spread layout
+    renderSpread();
+
+    // Hide interpretation and summary
+    document.getElementById('interpretation-panel').classList.remove('active');
+    document.getElementById('reading-summary').classList.remove('active');
+
+    showScreen('reading');
+}
+
+function renderSpread() {
+    const spread = spreads[currentSpread];
+    const layout = document.getElementById('spread-layout');
+    layout.innerHTML = '';
+
+    spread.positions.forEach((position, index) => {
+        const slot = document.createElement('div');
+        slot.className = 'card-slot';
+        slot.innerHTML = `
+            <div class="slot-number">${index + 1}</div>
+            <div class="slot-label">${position.label}</div>
+        `;
+        slot.onclick = () => revealCard(index);
+        layout.appendChild(slot);
+    });
+}
+
+function revealCard(index) {
+    const slots = document.querySelectorAll('.card-slot');
+    const slot = slots[index];
+
+    if (slot.classList.contains('revealed')) return;
+
+    const card = drawnCards[index];
+    slot.classList.add('revealed');
+    slot.onclick = null;
+
+    // Create tarot card element
+    const cardEl = createCardElement(card);
+    slot.innerHTML = '';
+    slot.appendChild(cardEl);
+
+    // Flip animation
+    setTimeout(() => cardEl.classList.add('flipped'), 100);
+
+    // Show interpretation
+    setTimeout(() => showInterpretation(card, index), 800);
+
+    revealedCount++;
+
+    // Show summary when all revealed
+    if (revealedCount === drawnCards.length) {
+        setTimeout(() => showReadingSummary(), 1000);
+    }
+}
+
+function createCardElement(card) {
+    const cardEl = document.createElement('div');
+    cardEl.className = 'tarot-card';
+
+    const deckType = card.deck || currentDeck;
+
+    cardEl.innerHTML = `
+        <div class="tarot-card-inner">
+            <div class="card-face card-back">
+                <div class="card-back-pattern">
+                    <div class="card-back-symbol">✦</div>
+                </div>
+            </div>
+            <div class="card-face card-front ${deckType}">
+                ${card.isReversed ? '<div class="card-reversed">Reversed</div>' : ''}
+                <div class="card-image">${card.symbol}</div>
+                <div class="card-title">${card.name}</div>
+            </div>
+        </div>
+    `;
+
+    return cardEl;
+}
+
+function showInterpretation(card, index) {
+    const spread = spreads[currentSpread];
+    const position = spread.positions[index];
+    const deckType = card.deck || currentDeck;
+
+    const panel = document.getElementById('interpretation-panel');
+    const interpretation = card.isReversed ? card.reversed : card.upright;
+
+    document.getElementById('interp-card-name').textContent = card.name;
+    document.getElementById('interp-card-name').className = `interp-card-name ${deckType}`;
+    document.getElementById('interp-position').textContent = position.label;
+    document.getElementById('interp-text').textContent = interpretation;
+
+    const reversedNote = document.getElementById('interp-reversed');
+    if (card.isReversed) {
+        reversedNote.style.display = 'block';
+        reversedNote.textContent = 'This card appeared reversed, indicating shadow aspects, blocks, or the internalization of its energy.';
+    } else {
+        reversedNote.style.display = 'none';
+    }
+
+    panel.classList.add('active');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function showReadingSummary() {
+    const spread = spreads[currentSpread];
+    const summaryCards = document.getElementById('summary-cards');
+    summaryCards.innerHTML = '';
+
+    drawnCards.forEach((card, index) => {
+        const position = spread.positions[index];
+        const deckType = card.deck || currentDeck;
+        const interpretation = card.isReversed ? card.reversed : card.upright;
+
+        const item = document.createElement('div');
+        item.className = 'summary-card-item';
+        item.innerHTML = `
+            <div class="summary-position">${position.label}</div>
+            <div class="summary-card-name ${deckType}">${card.name}${card.isReversed ? ' (Reversed)' : ''}</div>
+            <div class="summary-interpretation">${interpretation}</div>
+        `;
+        summaryCards.appendChild(item);
+    });
+
+    document.getElementById('reading-summary').classList.add('active');
+}
+
+function resetReading() {
+    if (currentSpread) {
+        startReading(currentSpread);
+    } else {
+        showScreen('home');
+    }
+}
+
+// ============================================================================
+// PART 4: BROWSE DECKS FUNCTIONALITY
+// ============================================================================
+
+let browseDeck = 'spiritual';
+
+function setBrowseDeck(deck) {
+    browseDeck = deck;
+    document.querySelectorAll('#browse .deck-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.deck === deck) {
+            btn.classList.add('active', deck);
+        }
+    });
+    renderBrowseDeck();
+}
+
+function renderBrowseDeck() {
+    const browser = document.getElementById('deck-browser');
+    const deckData = browseDeck === 'spiritual' ? jungianDeck : prosperityDeck;
+
+    const sections = [
+        { title: 'Major Arcana', cards: deckData.majorArcana, suit: 'major' },
+        { title: 'Wands - Fire', cards: deckData.wands, suit: 'wands' },
+        { title: 'Cups - Water', cards: deckData.cups, suit: 'cups' },
+        { title: 'Swords - Air', cards: deckData.swords, suit: 'swords' },
+        { title: 'Pentacles - Earth', cards: deckData.pentacles, suit: 'pentacles' }
+    ];
+
+    browser.innerHTML = '';
+
+    sections.forEach(section => {
+        const suitSection = document.createElement('div');
+        suitSection.className = 'suit-section';
+
+        const title = document.createElement('h3');
+        title.className = `suit-title ${browseDeck}`;
+        title.textContent = section.title;
+        suitSection.appendChild(title);
+
+        const grid = document.createElement('div');
+        grid.className = 'cards-grid';
+
+        section.cards.forEach(card => {
+            const browseCard = document.createElement('div');
+            browseCard.className = 'browse-card';
+            browseCard.onclick = () => showCardModal(card, browseDeck, section.suit);
+
+            browseCard.innerHTML = `
+                <div class="tarot-card">
+                    <div class="tarot-card-inner">
+                        <div class="card-face card-front ${browseDeck}">
+                            <div class="card-image">${card.symbol}</div>
+                            <div class="card-title">${card.name}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            grid.appendChild(browseCard);
+        });
+
+        suitSection.appendChild(grid);
+        browser.appendChild(suitSection);
+    });
+}
+
+function showCardModal(card, deck, suit) {
+    const modal = document.getElementById('card-modal');
+    const cardImage = document.getElementById('modal-card-image');
+    const symbol = document.getElementById('modal-symbol');
+    const titleSmall = document.getElementById('modal-title-small');
+    const cardName = document.getElementById('modal-card-name');
+    const cardSuit = document.getElementById('modal-card-suit');
+    const keywords = document.getElementById('modal-keywords');
+    const upright = document.getElementById('modal-upright');
+    const reversed = document.getElementById('modal-reversed');
+
+    cardImage.className = `modal-card-image ${deck}`;
+    symbol.textContent = card.symbol;
+    titleSmall.textContent = card.name;
+    cardName.textContent = card.name;
+    cardName.className = `modal-card-name ${deck}`;
+
+    const suitNames = {
+        major: 'Major Arcana',
+        wands: 'Wands - Fire',
+        cups: 'Cups - Water',
+        swords: 'Swords - Air',
+        pentacles: 'Pentacles - Earth'
+    };
+    cardSuit.textContent = suitNames[suit] || suit;
+
+    keywords.innerHTML = card.keywords.map(kw =>
+        `<span class="keyword">${kw}</span>`
+    ).join('');
+
+    upright.textContent = card.upright;
+    reversed.textContent = card.reversed;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('card-modal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+// Initialize browse deck on screen change
+const originalShowScreen = showScreen;
+showScreen = function(screenName) {
+    originalShowScreen(screenName);
+    if (screenName === 'browse') {
+        const browser = document.getElementById('deck-browser');
+        if (!browser.innerHTML || browser.innerHTML.trim() === '') {
+            renderBrowseDeck();
+        }
+    }
+};
+
+// Close modal on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+});
+
+console.log('✨ Parts 1-4 Complete!');
+console.log('🌀 Jungian Depths: 78 cards loaded');
+console.log('💫 Universal Prosperity: 78 cards loaded');
+console.log('📖 All 8 spreads configured');
+console.log('🎴 Interactive readings ready');
+console.log('👁️ Browse functionality ready');
+</script>
+</body>
+</html>
